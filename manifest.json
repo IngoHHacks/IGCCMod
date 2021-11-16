@@ -1,0 +1,11 @@
+{
+    "name": "IGCC",
+    "version_number": "1.0.0",
+    "website_url": "TBA",
+    "description": "A BepInEx plugin that allows for the creation of custom cards in-game.",
+    "dependencies": [
+        "BepInEx-BepInExPack_Inscryption-5.4.1701",
+        "MADH95Mods-JSONCardLoader-1.6.1",
+        "API_dev-API-1.11.0"
+    ]
+}

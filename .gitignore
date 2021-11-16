@@ -1,0 +1,8 @@
+.vs/
+obj/
+bin/*
+!bin/IGCCMod.dll
+Properties/
+lib/*
+!lib/Sirenix.Serialization.dll
+IGCCMod.sln
