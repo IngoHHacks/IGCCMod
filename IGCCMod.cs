@@ -169,7 +169,7 @@ namespace IGCCMod
                         preview.SetInfo(preview.Info);
                         yield return new WaitForSeconds(0.25f);
                         // Health
-                        if (preview.Info.SpecialAbilities.Contains(SpecialTriggeredAbility.Lammergeier))
+                        if (!preview.Info.SpecialAbilities.Contains(SpecialTriggeredAbility.Lammergeier))
                         {
                             yield return CreateHealthCard(__instance, preview);
                             preview.RenderInfo.hiddenHealth = false;
