@@ -16,4 +16,4 @@ Discord: **IngoH#3923**<br>
 - Portraits can contain duplicates.
 
 ### Other Notes ###
-- All portraits are exported to a new file, regardless of whether it already exists as file.
+- All portraits are exported to a new file, regardless of whether it already exists as a file.
