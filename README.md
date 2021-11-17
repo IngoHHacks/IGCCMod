@@ -8,4 +8,6 @@ Discord: **IngoH#3923**<br>
 - Add descriptions for card properties.
 
 ### Known Bugs ###
-- Hidden cards appear in card selections if the game is not restarted.
+- Hidden cards appear in card selections if the game is not restarted. (Might be due to API; might be fixed)
+- Some game-crashing abilites can be chosen.
+- Some options are missing.
