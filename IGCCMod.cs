@@ -82,11 +82,13 @@ namespace IGCCMod
             }
         }
 
+
         private static void LookDown()
         {
             bool skipMove = false;
             if (Singleton<ViewManager>.Instance.CurrentView == View.SanctumFloorDown) skipMove = true;
             Singleton<ViewManager>.Instance.SwitchToView(View.SanctumFloorDown, immediate: false, lockAfter: true);
+            Pixelplacement.Tween.LocalRotation(Singleton<ViewManager>.Instance.CameraParent, new Vector3(90, 0, 0), 0.25f, 0f, Pixelplacement.Tween.EaseInOut);
             if (!skipMove)
             {
                 Vector3 pos = Singleton<ViewManager>.Instance.CameraParent.localPosition;
@@ -408,7 +410,6 @@ namespace IGCCMod
                         selectedCard = (SelectableCard)c2;
                     });
                 }
-                Pixelplacement.Tween.LocalRotation(Singleton<ViewManager>.Instance.CameraParent, new Vector3(90, 0, 0), 0.25f, 0f, Pixelplacement.Tween.EaseInOut);
                 Singleton<TextDisplayer>.Instance.ShowMessage("What should I do with this card?");
                 foreach (SelectableCard item in cards)
                 {
@@ -425,7 +426,7 @@ namespace IGCCMod
                     string json = "{\r\n";
                     json += GetJsonFromString("name", name) + ",\r\n";
                     json += GetJsonFromString("displayedName", preview.Info.DisplayedNameEnglish.Replace("\"", "'")) + ",\r\n";
-                    json += GetJsonFromString("description", preview.Info.description) + ",\r\n";
+                    json += GetJsonFromString("description", preview.Info.description.Replace("\"", "'")) + ",\r\n";
                     if (preview.Info.metaCategories.Count > 0) json += GetJsonFromStringList("metaCategories", preview.Info.metaCategories) + ",\r\n";
                     json += GetJsonFromString("cardComplexity", preview.Info.cardComplexity.ToString()) + ",\r\n";
                     json += GetJsonFromString("temple", "Nature") + ",\r\n";
@@ -485,9 +486,9 @@ namespace IGCCMod
                 if (selectedCard.Info.DisplayedNameEnglish.Contains("quit"))
                 {
                     preview.Anim.PlayDeathAnimation();
-                    UnityEngine.Object.Destroy(preview.gameObject, 2f);
+                    UnityEngine.Object.Destroy(preview.gameObject, 0.5f);
                     DestroyAllCards(cards, true);
-                    yield return new WaitForSeconds(0.5f);
+                    yield return new WaitForSeconds(0.55f);
                 } else
                 {
                     DestroyAllCards(cards, true);
@@ -527,15 +528,15 @@ namespace IGCCMod
             private static string GetJsonFromAbilityList(List<Ability> values)
             {
                 string all = "";
-                List <Ability> baseAbilities = new List<Ability>();
-                List <Ability> modAbilites = new List<Ability>();
+                List<Ability> baseAbilities = new List<Ability>();
+                List<Ability> modAbilities = new List<Ability>();
                 foreach (Ability ability in values)
                 {
-                    if ((int)ability > 99) baseAbilities.Add(ability);
-                    else modAbilites.Add(ability);
+                    if ((int)ability <= 99) baseAbilities.Add(ability);
+                    else modAbilities.Add(ability);
                 }
-                if (baseAbilities.Count > 0) all += "  " + "\"abilities\": [" + GetJsonFromAbilityList(baseAbilities) + "],\r\n";
-                if (baseAbilities.Count > 0) all += "  " + "\"customAbilities\": [" + GetJsonFromAbilityList(baseAbilities) + "  ],\r\n";
+                if (baseAbilities.Count > 0) all += "  " + "\"abilities\": [" + ParseListAbilityJson(baseAbilities) + "],\r\n";
+                if (modAbilities.Count > 0) all += "  " + "\"customAbilities\": [" + ParseListModAbilityJson(modAbilities) + "  ],\r\n";
                 return all;
             }
 
@@ -574,8 +575,8 @@ namespace IGCCMod
                 {
                     if (initial != "\r\n") initial += ",\r\n";
                     APIPlugin.AbilityIdentifier id = APIPlugin.NewAbility.abilities[(int)value - 100].id;
-                    string guid = (string)id.GetType().GetField("guid", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(id);
-                    string name = (string)id.GetType().GetField("name", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(id);
+                    string guid = id.ToString().Split(new char[] { '(' })[0];
+                    string name = id.ToString().Split(new char[] { '(' })[1].Split(new char[] { ')' })[0];
                     initial += "    {\r\n";
                     initial += "    " + GetJsonFromString("name", name) + ",\r\n";
                     initial += "    " + GetJsonFromString("GUID", guid) + "\r\n";
@@ -647,7 +648,6 @@ namespace IGCCMod
                         selectedCard = (SelectableCard)c2;
                     });
                 }
-                Pixelplacement.Tween.LocalRotation(Singleton<ViewManager>.Instance.CameraParent, new Vector3(90, 0, 0), 0.25f, 0f, Pixelplacement.Tween.EaseInOut);
                 Singleton<TextDisplayer>.Instance.ShowMessage("Choose the [c:bR]type[c:] of card.");
                 foreach (SelectableCard item in cards)
                 {
@@ -686,7 +686,6 @@ namespace IGCCMod
                         selectedCard = (SelectableCard)c2;
                     });
                 }
-                Pixelplacement.Tween.LocalRotation(Singleton<ViewManager>.Instance.CameraParent, new Vector3(90, 0, 0), 0.25f, 0f, Pixelplacement.Tween.EaseInOut);
                 Singleton<TextDisplayer>.Instance.ShowMessage("Choose the [c:bR]complexity[c:] of card.");
                 foreach (SelectableCard item in cards)
                 {
@@ -779,7 +778,6 @@ namespace IGCCMod
                             choices.Add(null);
                         }
                     }
-                    Pixelplacement.Tween.LocalRotation(Singleton<ViewManager>.Instance.CameraParent, new Vector3(90, 0, 0), 0.25f, 0f, Pixelplacement.Tween.EaseInOut);
                     Singleton<TextDisplayer>.Instance.ShowMessage("Please, choose a card to draw the [c:bR]cost[c:] from.");
                     foreach (SelectableCard item in cards)
                     {
@@ -882,8 +880,6 @@ namespace IGCCMod
                             choices.Add(null);
                         }
                     }
-                    // Look to the right
-                    Pixelplacement.Tween.LocalRotation(Singleton<ViewManager>.Instance.CameraParent, new Vector3(75, 0, 0), 0.25f, 0f, Pixelplacement.Tween.EaseInOut);
                     Singleton<TextDisplayer>.Instance.ShowMessage("Choose one.");
                     // Enable cards to be selected
                     foreach (SelectableCard item in cards)
@@ -982,7 +978,6 @@ namespace IGCCMod
                             choices.Add(null);
                         }
                     }
-                    Pixelplacement.Tween.LocalRotation(Singleton<ViewManager>.Instance.CameraParent, new Vector3(90, 0, 0), 0.25f, 0f, Pixelplacement.Tween.EaseInOut);
                     if (type == 0) Singleton<TextDisplayer>.Instance.ShowMessage("Choose which card it will evolve into.");
                     else if (type == 1) Singleton<TextDisplayer>.Instance.ShowMessage("Choose which card it will create upon death.");
                     foreach (SelectableCard item in cards)
@@ -1057,7 +1052,6 @@ namespace IGCCMod
                         selectedCard = (SelectableCard)c2;
                     });
                 }
-                Pixelplacement.Tween.LocalRotation(Singleton<ViewManager>.Instance.CameraParent, new Vector3(90, 0, 0), 0.25f, 0f, Pixelplacement.Tween.EaseInOut);
                 Singleton<TextDisplayer>.Instance.ShowMessage("Please, choose a card to draw the [c:bR]cost[c:] from.");
                 foreach (SelectableCard item in cards)
                 {
@@ -1150,7 +1144,6 @@ namespace IGCCMod
                             choices.Add(null);
                         }
                     }
-                    Pixelplacement.Tween.LocalRotation(Singleton<ViewManager>.Instance.CameraParent, new Vector3(90, 0, 0), 0.25f, 0f, Pixelplacement.Tween.EaseInOut);
                     Singleton<TextDisplayer>.Instance.ShowMessage("And another. This time I will use its [c:bR]power[c:].");
                     foreach (SelectableCard item in cards)
                     {
@@ -1237,7 +1230,6 @@ namespace IGCCMod
                             choices.Add(null);
                         }
                     }
-                    Pixelplacement.Tween.LocalRotation(Singleton<ViewManager>.Instance.CameraParent, new Vector3(90, 0, 0), 0.25f, 0f, Pixelplacement.Tween.EaseInOut);
                     Singleton<TextDisplayer>.Instance.ShowMessage("And another. This time I will use its [c:bR]health[c:].");
                     foreach (SelectableCard item in cards)
                     {
@@ -1385,7 +1377,6 @@ namespace IGCCMod
                                 choices.Add(null);
                             }
                         }
-                        Pixelplacement.Tween.LocalRotation(Singleton<ViewManager>.Instance.CameraParent, new Vector3(90, 0, 0), 0.25f, 0f, Pixelplacement.Tween.EaseInOut);
                         Singleton<TextDisplayer>.Instance.ShowMessage("Now choose some cards from which we will extract the [c:bR]sigils[c:].");
                         foreach (SelectableCard item in cards)
                         {
@@ -1457,7 +1448,7 @@ namespace IGCCMod
                 List<Trait> selectedTraits = new List<Trait>();
                 List<SelectableCard> cards = new List<SelectableCard>();
                 int abilitiesCount = (int)SpecialTriggeredAbility.NUM_ABILITIES;
-                int traitCount = (int)Trait.NUM_TRAITS;
+                int traitCount = (int)Trait.NUM_TRAITS - 1;
                 List<SpecialTriggeredAbility> validAbilities = new List<SpecialTriggeredAbility>();
                 for (int i = 1; i < abilitiesCount; i++)
                 {
@@ -1504,8 +1495,8 @@ namespace IGCCMod
                                     {
                                         if (page * 15 + i >= validAbilities.Count)
                                         {
-                                            c.traits.Add((Trait)(page * 15 + i - validAbilities.Count));
-                                            addTo.nameReplacement = ((Trait)(page * 15 + i - validAbilities.Count)).ToString();
+                                            c.traits.Add((Trait)(page * 15 + i - validAbilities.Count + 1));
+                                            addTo.nameReplacement = ((Trait)(page * 15 + i - validAbilities.Count + 1)).ToString();
                                         }
                                         else
                                         {
@@ -1554,7 +1545,6 @@ namespace IGCCMod
                                 choices.Add(null);
                             }
                         }
-                        Pixelplacement.Tween.LocalRotation(Singleton<ViewManager>.Instance.CameraParent, new Vector3(90, 0, 0), 0.25f, 0f, Pixelplacement.Tween.EaseInOut);
                         Singleton<TextDisplayer>.Instance.ShowMessage("Finally, choose the hidden [c:bR]special abilities[c:] and [c:bR]traits[c:].");
                         foreach (SelectableCard item in cards)
                         {
@@ -1702,7 +1692,6 @@ namespace IGCCMod
                                 choices.Add(null);
                             }
                         }
-                        Pixelplacement.Tween.LocalRotation(Singleton<ViewManager>.Instance.CameraParent, new Vector3(90, 0, 0), 0.25f, 0f, Pixelplacement.Tween.EaseInOut);
                         Singleton<TextDisplayer>.Instance.ShowMessage("Now choose the [c:bR]tribes[c:].");
                         foreach (SelectableCard item in cards)
                         {
@@ -1811,9 +1800,10 @@ namespace IGCCMod
                 // Destroy selected card
                 LookUp();
                 yield return Singleton<TextDisplayer>.Instance.ShowUntilInput(examineDialogue);
+                LookDown();
                 selectedCard.Anim.PlayDeathAnimation();
                 Destroy(selectedCard.gameObject, 2f);
-                yield return new WaitForSeconds(0.25f);
+                yield return new WaitForSeconds(0.4f);
             }
 
             /// <see cref="PostCardSelect"/>
@@ -1860,11 +1850,11 @@ namespace IGCCMod
                 }
                 if (selectedTraits.Count > 0)
                 {
-                    string args = " ";
-                    int size = selectedSAs.Count;
+                    string args = "";
+                    int size = selectedTraits.Count;
                     for (int i = 0; i < size; i++)
                     {
-                        args += (selectedSAs[i].ToString());
+                        args += (selectedTraits[i].ToString());
                         if (i < size - 1)
                         {
                             if (i == size - 2)
@@ -1884,14 +1874,12 @@ namespace IGCCMod
                             }
                         }
                     }
-                    examineDialogue += string.Format(Localization.Translate("A [c:bR]Trait of {0}[c:]."), args);
+                    examineDialogue = string.Format(Localization.Translate("A [c:bR]Trait of {0}[c:]."), args);
                 }
-                else
-                {
-                    examineDialogue += string.Format(Localization.Translate("[c:bR]No Traits[c:]."));
-                }
+                if (selectedSAs.Count == 0 && selectedTraits.Count == 0) examineDialogue = string.Format(Localization.Translate("[c:bR]No Special Abilities. No Traits[c:]."));
                 LookUp();
                 yield return Singleton<TextDisplayer>.Instance.ShowUntilInput(examineDialogue);
+                LookDown();
                 foreach (SelectableCard item2 in cards)
                 {
                     if (item2 != null && (item2.Info.SpecialAbilities.Count > 0 && selectedSAs.Contains(item2.Info.SpecialAbilities[0]) || item2.Info.traits.Count > 0 && selectedTraits.Contains(item2.Info.traits[0])))
@@ -1900,7 +1888,7 @@ namespace IGCCMod
                         UnityEngine.Object.Destroy(item2.gameObject, 2f);
                     }
                 }
-                yield return new WaitForSeconds(0.25f);
+                yield return new WaitForSeconds(0.4f);
             }
 
             /// <see cref="PostCardSelect"/>
@@ -1953,6 +1941,7 @@ namespace IGCCMod
                 }
                 LookUp();
                 yield return Singleton<TextDisplayer>.Instance.ShowUntilInput(examineDialogue);
+                LookDown();
                 foreach (SelectableCard item2 in cards)
                 {
                     if (item2 != null && item2.Info.Abilities.Count > 0 && selectedSigils.Contains(item2.Info.Abilities[0]))
@@ -1961,7 +1950,7 @@ namespace IGCCMod
                         UnityEngine.Object.Destroy(item2.gameObject, 2f);
                     }
                 }
-                yield return new WaitForSeconds(0.25f);
+                yield return new WaitForSeconds(0.4f);
             }
 
             private static IEnumerator PostMultiTribeCardSelect(List<SelectableCard> cards, List<Tribe> selectedTribes)
@@ -2015,6 +2004,7 @@ namespace IGCCMod
                 }
                 LookUp();
                 yield return Singleton<TextDisplayer>.Instance.ShowUntilInput(examineDialogue);
+                LookDown();
                 foreach (SelectableCard item2 in cards)
                 {
                     if (item2 != null && item2.Info.tribes.Count > 0 && selectedTribes.Contains(item2.Info.tribes[0]))
@@ -2023,7 +2013,7 @@ namespace IGCCMod
                         UnityEngine.Object.Destroy(item2.gameObject, 2f);
                     }
                 }
-                yield return new WaitForSeconds(0.25f);
+                yield return new WaitForSeconds(0.4f);
             }
 
             private static void DestroyAllCards(List<SelectableCard> cards, bool playDeathAnim)
