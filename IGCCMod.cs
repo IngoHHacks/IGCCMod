@@ -305,6 +305,7 @@ namespace IGCCMod
                         yield return new WaitForSeconds(0.25f);
                         // Load textures from cards
                         // TODO: Remove duplicates
+                        Singleton<TextDisplayer>.Instance.ShowMessage("Loading portraits.");
                         Resources.LoadAll("art/cards/");
                         Texture2D[] textures = (Texture2D[])Resources.FindObjectsOfTypeAll(typeof(Texture2D));
                         List<Texture2D> validTextures = new List<Texture2D>();
@@ -699,7 +700,7 @@ namespace IGCCMod
                                     else if (page * 15 + i >= 5)
                                     {
                                         addTo.bonesCostAdjustment = (page * 15 + i - 4);
-                                        if (page * 15 + i - 6 == 1) addTo.nameReplacement = (page * 15 + i - 6) + " bone";
+                                        if (page * 15 + i - 4 == 1) addTo.nameReplacement = "1 bone";
                                         else addTo.nameReplacement = (page * 15 + i - 4) + " bones";
                                     }
                                     else if (page * 15 + i >= 1)
