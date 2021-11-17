@@ -101,6 +101,7 @@ namespace IGCCMod
 
         private static void LookUp()
         {
+            Singleton<RuleBookController>.Instance.SetShown(false);
             Singleton<ViewManager>.Instance.SwitchToView(View.SanctumFloorUp, immediate: false, lockAfter: true);
         }
 
@@ -120,6 +121,30 @@ namespace IGCCMod
         {
             Vector3 pos = Singleton<ViewManager>.Instance.CameraParent.localPosition;
             Pixelplacement.Tween.LocalPosition(Singleton<ViewManager>.Instance.CameraParent, new Vector3(pos.x, pos.y + 3.0f, pos.z + 1.25f), 0.25f, 0f, Pixelplacement.Tween.EaseInOut);
+        }
+
+
+        // Rulebook camera cancel
+        [HarmonyPatch(typeof(ViewManager), "OffsetPosition", new Type[] { typeof(Vector3), typeof(float) })]
+        public class RuleBookCameraPatch : ViewManager
+        {
+            public static bool Prefix(ViewManager __instance, Vector3 cameraOffset)
+            {
+                if (Instance.CurrentView == View.SanctumFloorDown)
+                {
+                    Vector3 pos = Instance.CameraParent.localPosition;
+                    if (cameraOffset.z >= 0)
+                    {
+                        Pixelplacement.Tween.LocalRotation(Singleton<ViewManager>.Instance.CameraParent, new Vector3(90, 0, 0), 0.25f, 0f, Pixelplacement.Tween.EaseInOut);
+                    }
+                    else
+                    {
+                        Pixelplacement.Tween.LocalRotation(Singleton<ViewManager>.Instance.CameraParent, new Vector3(105, 0, 0), 0.25f, 0f, Pixelplacement.Tween.EaseInOut);
+                    }
+                    return false;
+                }
+                else return true;
+            }
         }
 
         [HarmonyPatch(typeof(SanctumSceneSequencer), "DeathCardSequence", null)]
@@ -168,192 +193,225 @@ namespace IGCCMod
                 //if (SaveManager.SaveFile.currentRun.causeOfDeath.opponentType == Opponent.Type.PixelP03FinaleBoss)
                 //{
                 bool done = false;
-                while (!done)
+                if (SaveManager.SaveFile.currentRun.causeOfDeath.opponentType != Opponent.Type.PixelP03FinaleBoss)
                 {
-                    // Create preview card
-                    Transform obj = ((List<Transform>)__instance.GetType().GetField("cardPositionMarkers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(__instance))[0];
-                    Vector3 vector = GetCardIndexLoc(obj, 17);
-                    CardInfo c = ScriptableObject.CreateInstance<CardInfo>();
-                    CardModificationInfo addTo = new CardModificationInfo
+                    LookUp();
+                    yield return Singleton<TextDisplayer>.Instance.ShowUntilInput("It appears that you lost normally.");
+                    yield return Singleton<TextDisplayer>.Instance.ShowUntilInput("Only worthy challengers may access the Card Creator.");
+                    yield return Singleton<TextDisplayer>.Instance.ShowUntilInput("Try again, but this time open the backroom door normally.");
+                    yield return Singleton<TextDisplayer>.Instance.ShowMessage("Goodbye.");
+                    yield return new WaitForSeconds(0.5f);
+                    LeshyAnimationController.Instance.LeftArm.PlayAnimation("takephoto_left");
+                    yield return new WaitForSeconds(1.5f);
+                    if (UnityEngine.Random.value > 0.8f)
                     {
-                        nameReplacement = "current card"
-                    };
-                    c.Mods.Add(addTo);
-                    SelectableCard preview = CreatePreviewCard(__instance, vector, c);
-                    // Cost
-                    yield return CreateCostCard(__instance, preview);
-                    preview.Anim.PlayTransformAnimation();
-                    yield return new WaitForSeconds(0.15f);
-                    preview.SetInfo(preview.Info);
-                    yield return new WaitForSeconds(0.25f);
-                    // Attack
-                    yield return CreateAttackCard(__instance, preview);
-                    preview.RenderInfo.hiddenAttack = false;
-                    preview.Anim.PlayTransformAnimation();
-                    yield return new WaitForSeconds(0.15f);
-                    preview.SetInfo(preview.Info);
-                    yield return new WaitForSeconds(0.25f);
-                    // Health
-                    if (!preview.Info.SpecialAbilities.Contains(SpecialTriggeredAbility.Lammergeier))
-                    {
-                        yield return CreateHealthCard(__instance, preview);
-                        preview.RenderInfo.hiddenHealth = false;
-                        preview.Anim.PlayTransformAnimation();
-                        yield return new WaitForSeconds(0.15f);
-                        preview.SetInfo(preview.Info);
-                        yield return new WaitForSeconds(0.25f);
+                        Singleton<VideoCameraRig>.Instance.PlayCameraAnim("refocus_medium");
                     }
-                    // Sigils
-                    yield return CreateSigilCard(__instance, preview);
-                    preview.Anim.PlayTransformAnimation();
-                    yield return new WaitForSeconds(0.15f);
-                    preview.SetInfo(preview.Info);
-                    yield return new WaitForSeconds(0.25f);
-                    if (preview.Info.Abilities.Contains(Ability.Evolve) || preview.Info.Abilities.Contains(Ability.Transformer))
+                    LeshyAnimationController.Instance.LeftArm.SetTrigger("photo_flare");
+                    yield return new WaitForSeconds(1f);
+                    Singleton<TextDisplayer>.Instance.Clear();
+                    AudioSource audioSource2 = AudioController.Instance.PlaySound2D("camera_flash_gameover", MixerGroup.None, 0.85f);
+                    audioSource2.gameObject.name = "flashSound";
+                    UnityEngine.Object.DontDestroyOnLoad(audioSource2.gameObject);
+                    AudioController.Instance.StopAllLoops();
+                    Singleton<UIManager>.Instance.Effects.GetEffect<ScreenColorEffect>().SetColor(GameColors.Instance.nearWhite);
+                    Singleton<UIManager>.Instance.Effects.GetEffect<ScreenColorEffect>().SetIntensity(1f, 100f);
+                    SaveManager.SaveFile.NewPart1Run();
+                    yield return new WaitForSeconds(1f);
+                    AsyncOperation asyncOp2 = SceneLoader.StartAsyncLoad("Part1_Cabin");
+                    SceneLoader.CompleteAsyncLoad(asyncOp2);
+                    SaveManager.SaveToFile(saveActiveScene: false);
+                }
+                else
+                {
+                    while (!done)
                     {
-                        // Evolution
-                        yield return CreateEvolution(__instance, preview, 0);
+                        // Create preview card
+                        Transform obj = ((List<Transform>)__instance.GetType().GetField("cardPositionMarkers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(__instance))[0];
+                        Vector3 vector = GetCardIndexLoc(obj, 17);
+                        CardInfo c = ScriptableObject.CreateInstance<CardInfo>();
+                        CardModificationInfo addTo = new CardModificationInfo
+                        {
+                            nameReplacement = "current card"
+                        };
+                        c.Mods.Add(addTo);
+                        SelectableCard preview = CreatePreviewCard(__instance, vector, c);
+                        // Cost
+                        yield return CreateCostCard(__instance, preview);
                         preview.Anim.PlayTransformAnimation();
                         yield return new WaitForSeconds(0.15f);
                         preview.SetInfo(preview.Info);
                         yield return new WaitForSeconds(0.25f);
-                        if (preview.Info.evolveParams != null)
+                        // Attack
+                        yield return CreateAttackCard(__instance, preview);
+                        preview.RenderInfo.hiddenAttack = false;
+                        preview.Anim.PlayTransformAnimation();
+                        yield return new WaitForSeconds(0.15f);
+                        preview.SetInfo(preview.Info);
+                        yield return new WaitForSeconds(0.25f);
+                        // Health
+                        if (!preview.Info.SpecialAbilities.Contains(SpecialTriggeredAbility.Lammergeier))
                         {
-                            yield return CreateEvolutionTurnCount(__instance, preview);
+                            yield return CreateHealthCard(__instance, preview);
+                            preview.RenderInfo.hiddenHealth = false;
                             preview.Anim.PlayTransformAnimation();
                             yield return new WaitForSeconds(0.15f);
                             preview.SetInfo(preview.Info);
                             yield return new WaitForSeconds(0.25f);
                         }
-                    }
-                    if (preview.Info.Abilities.Contains(Ability.IceCube))
-                    {
-                        // Ice cube
-                        yield return CreateEvolution(__instance, preview, 1);
+                        // Sigils
+                        yield return CreateSigilCard(__instance, preview);
                         preview.Anim.PlayTransformAnimation();
                         yield return new WaitForSeconds(0.15f);
                         preview.SetInfo(preview.Info);
                         yield return new WaitForSeconds(0.25f);
-                    }
-                    // Tribe
-                    yield return CreateTribeCard(__instance, preview);
-                    preview.Anim.PlayTransformAnimation();
-                    yield return new WaitForSeconds(0.15f);
-                    preview.SetInfo(preview.Info);
-                    yield return new WaitForSeconds(0.25f);
-                    // Special Abilities
-                    yield return CreateSpecialAbilities(__instance, preview);
-                    preview.Anim.PlayTransformAnimation();
-                    yield return new WaitForSeconds(0.15f);
-                    preview.SetInfo(preview.Info);
-                    yield return new WaitForSeconds(0.25f);
-                    // Load textures from cards
-                    // TODO: Remove duplicates
-                    Texture2D[] textures = (Texture2D[])Resources.FindObjectsOfTypeAll(typeof(Texture2D));
-                    List<Texture2D> validTextures = new List<Texture2D>();
-                    int baseCount = 0;
-                    foreach (Texture2D texture in textures)
-                    {
-                        if (texture.width == 114 && texture.height == 94 && texture.name.StartsWith("portrait") && !texture.name.EndsWith("_emission"))
+                        if (preview.Info.Abilities.Contains(Ability.Evolve) || preview.Info.Abilities.Contains(Ability.Transformer))
                         {
-                            validTextures.Add(texture);
-                            baseCount++;
+                            // Evolution
+                            yield return CreateEvolution(__instance, preview, 0);
+                            preview.Anim.PlayTransformAnimation();
+                            yield return new WaitForSeconds(0.15f);
+                            preview.SetInfo(preview.Info);
+                            yield return new WaitForSeconds(0.25f);
+                            if (preview.Info.evolveParams != null)
+                            {
+                                yield return CreateEvolutionTurnCount(__instance, preview);
+                                preview.Anim.PlayTransformAnimation();
+                                yield return new WaitForSeconds(0.15f);
+                                preview.SetInfo(preview.Info);
+                                yield return new WaitForSeconds(0.25f);
+                            }
                         }
-                    }
-                    int modCount = 0;
-                    foreach (string file in Directory.GetFiles(Paths.PluginPath, "*.png", SearchOption.AllDirectories))
-                    {
-
-                        byte[] pngBytes = System.IO.File.ReadAllBytes(file);
-                        Texture2D texture = new Texture2D(2, 2);
-                        ImageConversion.LoadImage(texture, pngBytes);
-                        texture.name = file;
-                        if (texture.width == 114 && texture.height == 94 && !texture.name.EndsWith("_emission"))
+                        if (preview.Info.Abilities.Contains(Ability.IceCube))
                         {
-                            validTextures.Add(texture);
-                            modCount++;
+                            // Ice cube
+                            yield return CreateEvolution(__instance, preview, 1);
+                            preview.Anim.PlayTransformAnimation();
+                            yield return new WaitForSeconds(0.15f);
+                            preview.SetInfo(preview.Info);
+                            yield return new WaitForSeconds(0.25f);
                         }
-                    }
-                    // Portrait
-                    yield return CreatePortrait(__instance, preview, validTextures, baseCount, modCount);
-                    preview.Anim.PlayTransformAnimation();
-                    yield return new WaitForSeconds(0.15f);
-                    preview.SetInfo(preview.Info);
-                    yield return new WaitForSeconds(0.25f);
-                    // Rarity
-                    yield return CreateRarity(__instance, preview);
-                    preview.Anim.PlayTransformAnimation();
-                    yield return new WaitForSeconds(0.15f);
-                    preview.SetInfo(preview.Info);
-                    yield return new WaitForSeconds(0.25f);
-                    // Complexity
-                    yield return CreateComplexity(__instance, preview);
-                    preview.Anim.PlayTransformAnimation();
-                    yield return new WaitForSeconds(0.15f);
-                    preview.SetInfo(preview.Info);
-                    yield return new WaitForSeconds(0.25f);
-                    // Move to center
-                    Vector3 vector2 = GetCardIndexLoc(obj, 7);
-                    Pixelplacement.Tween.Position(preview.transform, vector2, 0.25f, 0f);
-
-                    // Enter name
-                    ___keyboardInput.maxInputLength = 127;
-                    yield return new WaitForSeconds(0.25f);
-                    ZoomIn();
-                    Singleton<TextDisplayer>.Instance.ShowMessage("You should give it a name.");
-                    CardModificationInfo nameMod = new CardModificationInfo();
-                    preview.Info.Mods.Add(nameMod);
-                    yield return __instance.GetType().GetMethod("EnterNameForCard", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(__instance, new object[] { preview, nameMod });
-                    yield return Singleton<TextDisplayer>.Instance.ShowUntilInput("[c:bR]" + nameMod.nameReplacement.Trim() + "[c:]?");
-                    yield return new WaitForSeconds(0.25f);
-
-                    // Enter description
-                    ___keyboardInput.maxInputLength = 1027;
-                    Singleton<TextDisplayer>.Instance.ShowMessage("Please type the description.");
-                    yield return EnterDescription(___keyboardInput, preview);
-                    yield return new WaitForSeconds(0.25f);
-                    MoveDown();
-                    yield return FinalizeCard(__instance, preview);
-                    // Finalize
-                    if (preview == null)
-                    {
-                        // End
-                        done = true;
-                    }
-                    else
-                    {
-                        // Restart
-                        preview.Anim.PlayDeathAnimation();
-                        UnityEngine.Object.Destroy(preview.gameObject, 2f);
+                        // Tribe
+                        yield return CreateTribeCard(__instance, preview);
+                        preview.Anim.PlayTransformAnimation();
+                        yield return new WaitForSeconds(0.15f);
+                        preview.SetInfo(preview.Info);
                         yield return new WaitForSeconds(0.25f);
-                    }
-                    ResetCamera();
+                        // Special Abilities
+                        yield return CreateSpecialAbilities(__instance, preview);
+                        preview.Anim.PlayTransformAnimation();
+                        yield return new WaitForSeconds(0.15f);
+                        preview.SetInfo(preview.Info);
+                        yield return new WaitForSeconds(0.25f);
+                        // Load textures from cards
+                        // TODO: Remove duplicates
+                        Resources.LoadAll("art/cards/");
+                        Texture2D[] textures = (Texture2D[])Resources.FindObjectsOfTypeAll(typeof(Texture2D));
+                        List<Texture2D> validTextures = new List<Texture2D>();
+                        int baseCount = 0;
+                        foreach (Texture2D texture in textures)
+                        {
+                            if (texture.width == 114 && texture.height == 94 && texture.name.StartsWith("portrait") && !texture.name.EndsWith("_emission"))
+                            {
+                                validTextures.Add(texture);
+                                baseCount++;
+                            }
+                        }
+                        int modCount = 0;
+                        foreach (string file in Directory.GetFiles(Paths.PluginPath, "*.png", SearchOption.AllDirectories))
+                        {
 
+                            byte[] pngBytes = System.IO.File.ReadAllBytes(file);
+                            Texture2D texture = new Texture2D(2, 2);
+                            ImageConversion.LoadImage(texture, pngBytes);
+                            texture.name = file;
+                            if (texture.width == 114 && texture.height == 94 && !texture.name.EndsWith("_emission"))
+                            {
+                                validTextures.Add(texture);
+                                modCount++;
+                            }
+                        }
+                        // Portrait
+                        yield return CreatePortrait(__instance, preview, validTextures, baseCount, modCount);
+                        preview.Anim.PlayTransformAnimation();
+                        yield return new WaitForSeconds(0.15f);
+                        preview.SetInfo(preview.Info);
+                        yield return new WaitForSeconds(0.25f);
+                        // Rarity
+                        yield return CreateRarity(__instance, preview);
+                        preview.Anim.PlayTransformAnimation();
+                        yield return new WaitForSeconds(0.15f);
+                        preview.SetInfo(preview.Info);
+                        yield return new WaitForSeconds(0.25f);
+                        // Complexity
+                        yield return CreateComplexity(__instance, preview);
+                        preview.Anim.PlayTransformAnimation();
+                        yield return new WaitForSeconds(0.15f);
+                        preview.SetInfo(preview.Info);
+                        yield return new WaitForSeconds(0.25f);
+                        // Move to center
+                        Vector3 vector2 = GetCardIndexLoc(obj, 7);
+                        Pixelplacement.Tween.Position(preview.transform, vector2, 0.25f, 0f);
+
+                        // Enter name
+                        ___keyboardInput.maxInputLength = 127;
+                        yield return new WaitForSeconds(0.25f);
+                        ZoomIn();
+                        Singleton<TextDisplayer>.Instance.ShowMessage("You should give it a name.");
+                        CardModificationInfo nameMod = new CardModificationInfo();
+                        preview.Info.Mods.Add(nameMod);
+                        yield return __instance.GetType().GetMethod("EnterNameForCard", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(__instance, new object[] { preview, nameMod });
+                        yield return Singleton<TextDisplayer>.Instance.ShowUntilInput("[c:bR]" + nameMod.nameReplacement.Trim() + "[c:]?");
+                        yield return new WaitForSeconds(0.25f);
+
+                        // Enter description
+                        ___keyboardInput.maxInputLength = 1027;
+                        Singleton<TextDisplayer>.Instance.ShowMessage("Please type the description.");
+                        yield return EnterDescription(___keyboardInput, preview);
+                        yield return new WaitForSeconds(0.25f);
+                        MoveDown();
+                        yield return FinalizeCard(__instance, preview);
+                        // Finalize
+                        if (preview == null)
+                        {
+                            // End
+                            done = true;
+                        }
+                        else
+                        {
+                            // Restart
+                            preview.Anim.PlayDeathAnimation();
+                            UnityEngine.Object.Destroy(preview.gameObject, 2f);
+                            yield return new WaitForSeconds(0.25f);
+                        }
+                        ResetCamera();
+
+                    }
+                    // Take photo and return to table
+                    yield return new WaitForSeconds(0.5f);
+                    yield return Singleton<TextDisplayer>.Instance.ShowMessage("It is time for you to return.");
+                    LookUp();
+                    yield return new WaitForSeconds(0.5f);
+                    LeshyAnimationController.Instance.LeftArm.PlayAnimation("takephoto_left");
+                    yield return new WaitForSeconds(1.5f);
+                    if (UnityEngine.Random.value > 0.8f)
+                    {
+                        Singleton<VideoCameraRig>.Instance.PlayCameraAnim("refocus_medium");
+                    }
+                    LeshyAnimationController.Instance.LeftArm.SetTrigger("photo_flare");
+                    yield return new WaitForSeconds(1f);
+                    Singleton<TextDisplayer>.Instance.Clear();
+                    AudioSource audioSource = AudioController.Instance.PlaySound2D("camera_flash_gameover", MixerGroup.None, 0.85f);
+                    audioSource.gameObject.name = "flashSound";
+                    UnityEngine.Object.DontDestroyOnLoad(audioSource.gameObject);
+                    AudioController.Instance.StopAllLoops();
+                    Singleton<UIManager>.Instance.Effects.GetEffect<ScreenColorEffect>().SetColor(GameColors.Instance.nearWhite);
+                    Singleton<UIManager>.Instance.Effects.GetEffect<ScreenColorEffect>().SetIntensity(1f, 100f);
+                    yield return new WaitForSeconds(1f);
+                    AsyncOperation asyncOp = SceneLoader.StartAsyncLoad("Part1_Cabin");
+                    SceneLoader.CompleteAsyncLoad(asyncOp);
+                    SaveManager.SaveToFile(saveActiveScene: false);
                 }
-                // Take photo and return to table
-                yield return new WaitForSeconds(0.5f);
-                yield return Singleton<TextDisplayer>.Instance.ShowMessage("It is time for you to return.");
-                LookUp();
-                yield return new WaitForSeconds(0.5f);
-                LeshyAnimationController.Instance.LeftArm.PlayAnimation("takephoto_left");
-                yield return new WaitForSeconds(1.5f);
-                if (UnityEngine.Random.value > 0.8f)
-                {
-                    Singleton<VideoCameraRig>.Instance.PlayCameraAnim("refocus_medium");
-                }
-                LeshyAnimationController.Instance.LeftArm.SetTrigger("photo_flare");
-                yield return new WaitForSeconds(1f);
-                Singleton<TextDisplayer>.Instance.Clear();
-                AudioSource audioSource = AudioController.Instance.PlaySound2D("camera_flash_gameover", MixerGroup.None, 0.85f);
-                audioSource.gameObject.name = "flashSound";
-                UnityEngine.Object.DontDestroyOnLoad(audioSource.gameObject);
-                AudioController.Instance.StopAllLoops();
-                Singleton<UIManager>.Instance.Effects.GetEffect<ScreenColorEffect>().SetColor(GameColors.Instance.nearWhite);
-                Singleton<UIManager>.Instance.Effects.GetEffect<ScreenColorEffect>().SetIntensity(1f, 100f);
-                yield return new WaitForSeconds(1f);
-                AsyncOperation asyncOp = SceneLoader.StartAsyncLoad("Part1_Cabin");
-                SceneLoader.CompleteAsyncLoad(asyncOp);
-                SaveManager.SaveToFile(saveActiveScene: false);
                 //}
             }
 
@@ -606,11 +664,11 @@ namespace IGCCMod
                 int page = 0;
                 SelectableCard selectedCard = null;
                 List<SelectableCard> cards = new List<SelectableCard>();
+                LookDown();
                 while (!valid)
                 {
                     selectedCard = null;
                     cards.Clear();
-                    LookDown();
                     List<CardInfo> choices = new List<CardInfo>();
                     Transform obj = ((List<Transform>)__instance.GetType().GetField("cardPositionMarkers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(__instance))[0];
                     for (int i = 0; i <= 16; i++)
@@ -718,13 +776,13 @@ namespace IGCCMod
                 SelectableCard selectedCard = null;
                 List<SelectableCard> cards = new List<SelectableCard>();
                 yield return Singleton<TextDisplayer>.Instance.ShowUntilInput("I found [c:bR]" + baseCount + " loaded portraits[c:] and [c:bR]" + modCount + " portrait files[c:].");
+                // Look at floor
+                LookDown();
                 // Until a non-page card is selected
                 while (!valid)
                 {
                     selectedCard = null;
                     cards.Clear();
-                    // Look at floor
-                    LookDown();
 
                     List<CardInfo> choices = new List<CardInfo>();
                     // Cards are spawned relative to the first death card marker
@@ -828,11 +886,11 @@ namespace IGCCMod
                         if (!validCards.Contains(card)) validCards.Add(card);
                     }
                 }
+                LookDown();
                 while (!valid)
                 {
                     selectedCard = null;
                     cards.Clear();
-                    LookDown();
                     List<CardInfo> choices = new List<CardInfo>();
                     Transform obj = ((List<Transform>)__instance.GetType().GetField("cardPositionMarkers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(__instance))[0];
                     for (int i = 0; i <= 16; i++)
@@ -973,11 +1031,11 @@ namespace IGCCMod
                 SelectableCard selectedCard = null;
                 List<SelectableCard> cards = new List<SelectableCard>();
                 int specialStatIcons = (int)SpecialStatIcon.NUM_ICONS - 1;
+                LookDown();
                 while (!valid)
                 {
                     selectedCard = null;
                     cards.Clear();
-                    LookDown();
                     List<CardInfo> choices = new List<CardInfo>();
                     Transform obj = ((List<Transform>)__instance.GetType().GetField("cardPositionMarkers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(__instance))[0];
                     for (int i = 0; i <= 16; i++)
@@ -1085,11 +1143,11 @@ namespace IGCCMod
                 int page = 0;
                 SelectableCard selectedCard = null;
                 List<SelectableCard> cards = new List<SelectableCard>();
+                LookDown();
                 while (!valid)
                 {
                     selectedCard = null;
                     cards.Clear();
-                    LookDown();
                     List<CardInfo> choices = new List<CardInfo>();
                     Transform obj = ((List<Transform>)__instance.GetType().GetField("cardPositionMarkers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(__instance))[0];
                     for (int i = 0; i <= 16; i++)
@@ -1214,14 +1272,14 @@ namespace IGCCMod
                 }
                 List<CardInfo> choices = null;
                 Transform obj = null;
+                LookDown();
                 // Until confirm is selected
                 while (!valid)
                 {
                     selectedCard = null;
                     if (!skipRegenerate)
                     {
-                        cards.Clear();
-                        LookDown();
+                        cards.Clear();;
                         choices = new List<CardInfo>();
                         obj = ((List<Transform>)__instance.GetType().GetField("cardPositionMarkers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(__instance))[0];
                         for (int i = 0; i <= 16; i++)
@@ -1374,13 +1432,13 @@ namespace IGCCMod
                 });
                 List<CardInfo> choices = null;
                 Transform obj = null;
+                LookDown();
                 while (!valid)
                 {
                     selectedCard = null;
                     if (!skipRegenerate)
                     {
                         cards.Clear();
-                        LookDown();
                         choices = new List<CardInfo>();
                         obj = ((List<Transform>)__instance.GetType().GetField("cardPositionMarkers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(__instance))[0];
                         for (int i = 0; i <= 16; i++)
@@ -1533,13 +1591,13 @@ namespace IGCCMod
                 });
                 List<CardInfo> choices = null;
                 Transform obj = null;
+                LookDown();
                 while (!valid)
                 {
                     selectedCard = null;
                     if (!skipRegenerate)
                     {
                         cards.Clear();
-                        LookDown();
                         choices = new List<CardInfo>();
                         obj = ((List<Transform>)__instance.GetType().GetField("cardPositionMarkers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(__instance))[0];
                         for (int i = 0; i <= 16; i++)
@@ -1667,11 +1725,11 @@ namespace IGCCMod
                 switch (mode)
                 {
                     case 0:
-                        if (selectedCard.Info.GemsCost.Count > 0) examineDialogue = string.Format("A [c:bR]{0} gem[c:].", selectedCard.Info.GemsCost[0].ToString());
+                        if (selectedCard.Info.GemsCost.Count > 0) examineDialogue = string.Format("A cost of a [c:bR]{0} gem[c:].", selectedCard.Info.GemsCost[0].ToString());
                         else if (selectedCard.Info.EnergyCost > 0) examineDialogue = string.Format("A cost of [c:bR]{0} energy[c:].", selectedCard.Info.EnergyCost);
-                        else if (selectedCard.Info.BonesCost > 1) examineDialogue = string.Format("A cost of[c:bR]{0} bones[c:].", selectedCard.Info.BonesCost);
-                        else if (selectedCard.Info.BonesCost > 0) examineDialogue = string.Format("A cost of[c:bR]1 bone[c:].");
-                        else if (selectedCard.Info.BloodCost > 0) examineDialogue = string.Format("A [c:bR]{0} blood[c:].", selectedCard.Info.BloodCost);
+                        else if (selectedCard.Info.BonesCost > 1) examineDialogue = string.Format("A cost of [c:bR]{0} bones[c:].", selectedCard.Info.BonesCost);
+                        else if (selectedCard.Info.BonesCost > 0) examineDialogue = string.Format("A cost of [c:bR]1 bone[c:].");
+                        else if (selectedCard.Info.BloodCost > 0) examineDialogue = string.Format("A cost of [c:bR]{0} blood[c:].", selectedCard.Info.BloodCost);
                         else examineDialogue = string.Format("A cost of... [c:bR]free[c:].");
                         break;
                     case 1:

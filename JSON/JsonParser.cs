@@ -21,7 +21,7 @@ namespace IGCCMod.JSON
             json += GetJsonFromString("temple", "Nature") + ",\r\n";
             json += GetJsonFromInt("baseAttack", preview.Info.Attack) + ",\r\n";
             json += GetJsonFromInt("baseHealth", preview.Info.Health) + ",\r\n";
-            if (preview.Info.BloodCost > 0 || preview.Info.BonesCost == 0 && preview.Info.EnergyCost == 0) json += GetJsonFromInt("cost", preview.Info.BloodCost) + ",\r\n";
+            if (preview.Info.BloodCost > 0) json += GetJsonFromInt("cost", preview.Info.BloodCost) + ",\r\n";
             if (preview.Info.BonesCost > 0) json += GetJsonFromInt("bonesCost", preview.Info.BonesCost) + ",\r\n";
             if (preview.Info.EnergyCost > 0) json += GetJsonFromInt("energyCost", preview.Info.EnergyCost) + ",\r\n";
             if (preview.Info.GemsCost.Count > 0) json += GetJsonFromStringList("gemsCost", preview.Info.GemsCost) + ",\r\n";
