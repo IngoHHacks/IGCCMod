@@ -795,7 +795,7 @@ namespace IGCCMod
                 else if (selectedCard.Info.EnergyCost > 0) addTo2.energyCostAdjustment = selectedCard.Info.EnergyCost;
                 else if (selectedCard.Info.GemsCost.Count > 0) addTo2.addGemCost = selectedCard.Info.GemsCost;
                 preview.Info.Mods.Add(addTo2);
-                yield return PostCardSelect(cards, selectedCard, 2);
+                yield return PostCardSelect(cards, selectedCard, 0);
             }
 
             private static IEnumerator CreatePortrait(DeathCardCreationSequencer __instance, SelectableCard preview, List<Texture2D> portraits, int baseCount, int modCount)
@@ -1262,9 +1262,8 @@ namespace IGCCMod
                 {
                    baseAbilities.Add((Ability)i);
                 }
-                // TODO: Uncomment when custom sigils are implemented
-                //List<Ability> a1 = AbilitiesUtil.GetAbilities(false, categoryCriteria: AbilityMetaCategory.Part1Rulebook);
-                //List<Ability> a2 = AbilitiesUtil.GetAbilities(false, categoryCriteria: AbilityMetaCategory.Part3Rulebook);
+                List<Ability> a1 = AbilitiesUtil.GetAbilities(false, categoryCriteria: AbilityMetaCategory.Part1Rulebook);
+                List<Ability> a2 = AbilitiesUtil.GetAbilities(false, categoryCriteria: AbilityMetaCategory.Part3Rulebook);
                
                 Transform objP = ((List<Transform>)__instance.GetType().GetField("cardPositionMarkers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(__instance))[0];
                 
@@ -1286,15 +1285,14 @@ namespace IGCCMod
                 {
                     if (!abilities.Contains(a)) abilities.Add(a);
                 }
-                // TODO: Uncomment when custom sigils are implemented
-                //foreach (Ability a in a1)
-                //{
-                //    if (!abilities.Contains(a)) abilities.Add(a);
-                //}
-                //foreach (Ability a in a2)
-                //{
-                //    if (!abilities.Contains(a)) abilities.Add(a);
-                //}
+                foreach (Ability a in a1)
+                {
+                    if (!abilities.Contains(a)) abilities.Add(a);
+                }
+                foreach (Ability a in a2)
+                {
+                    if (!abilities.Contains(a)) abilities.Add(a);
+                }
                 List<CardInfo> choices = null;
                 Transform obj = null;
                 // Until confirm is selected
