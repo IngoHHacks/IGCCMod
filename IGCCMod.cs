@@ -103,6 +103,24 @@ namespace IGCCMod
             Singleton<ViewManager>.Instance.SwitchToView(View.SanctumFloorUp, immediate: false, lockAfter: true);
         }
 
+        private static void ZoomIn()
+        {
+            Vector3 pos = Singleton<ViewManager>.Instance.CameraParent.localPosition;
+            Pixelplacement.Tween.LocalPosition(Singleton<ViewManager>.Instance.CameraParent, new Vector3(pos.x, pos.y - 3.0f, pos.z), 0.25f, 0f, Pixelplacement.Tween.EaseInOut);
+        }
+
+        private static void MoveDown()
+        {
+            Vector3 pos = Singleton<ViewManager>.Instance.CameraParent.localPosition;
+            Pixelplacement.Tween.LocalPosition(Singleton<ViewManager>.Instance.CameraParent, new Vector3(pos.x, pos.y, pos.z - 1.25f), 0.25f, 0f, Pixelplacement.Tween.EaseInOut);
+        }
+
+        private static void ResetCamera()
+        {
+            Vector3 pos = Singleton<ViewManager>.Instance.CameraParent.localPosition;
+            Pixelplacement.Tween.LocalPosition(Singleton<ViewManager>.Instance.CameraParent, new Vector3(pos.x, pos.y + 3.0f, pos.z + 1.25f), 0.25f, 0f, Pixelplacement.Tween.EaseInOut);
+        }
+
         [HarmonyPatch(typeof(SanctumSceneSequencer), "DeathCardSequence", null)]
         public class DeathCardStartPatch : SanctumSceneSequencer
         {
@@ -278,7 +296,9 @@ namespace IGCCMod
                     Pixelplacement.Tween.Position(preview.transform, vector2, 0.25f, 0f);
 
                     // Enter name
-                    ___keyboardInput.maxInputLength = 255;
+                    ___keyboardInput.maxInputLength = 127;
+                    yield return new WaitForSeconds(0.25f);
+                    ZoomIn();
                     Singleton<TextDisplayer>.Instance.ShowMessage("You should give it a name.");
                     CardModificationInfo nameMod = new CardModificationInfo();
                     preview.Info.Mods.Add(nameMod);
@@ -291,6 +311,7 @@ namespace IGCCMod
                     Singleton<TextDisplayer>.Instance.ShowMessage("Please type the description.");
                     yield return EnterDescription(___keyboardInput, preview);
                     yield return new WaitForSeconds(0.25f);
+                    MoveDown();
                     yield return FinalizeCard(__instance, preview);
                     // Finalize
                     if (preview == null)
@@ -305,6 +326,7 @@ namespace IGCCMod
                         UnityEngine.Object.Destroy(preview.gameObject, 2f);
                         yield return new WaitForSeconds(0.25f);
                     }
+                    ResetCamera();
 
                 }
                 // Take photo and return to table
