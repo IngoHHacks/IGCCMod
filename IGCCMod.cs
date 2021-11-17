@@ -149,8 +149,10 @@ namespace IGCCMod
                         Transform obj = ((List<Transform>)__instance.GetType().GetField("cardPositionMarkers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(__instance))[0];
                         Vector3 vector = GetCardIndexLoc(obj, 17);
                         CardInfo c = ScriptableObject.CreateInstance<CardInfo>();
-                        CardModificationInfo addTo = new CardModificationInfo();
-                        addTo.nameReplacement = "current card";
+                        CardModificationInfo addTo = new CardModificationInfo
+                        {
+                            nameReplacement = "current card"
+                        };
                         c.Mods.Add(addTo);
                         SelectableCard preview = CreatePreviewCard(__instance, vector, c);
                         // Cost
@@ -167,12 +169,22 @@ namespace IGCCMod
                         preview.SetInfo(preview.Info);
                         yield return new WaitForSeconds(0.25f);
                         // Health
-                        yield return CreateHealthCard(__instance, preview);
-                        preview.RenderInfo.hiddenHealth = false;
-                        preview.Anim.PlayTransformAnimation();
-                        yield return new WaitForSeconds(0.15f);
-                        preview.SetInfo(preview.Info);
-                        yield return new WaitForSeconds(0.25f);
+                        if (preview.Info.SpecialAbilities.Contains(SpecialTriggeredAbility.Lammergeier))
+                        {
+                            yield return CreateHealthCard(__instance, preview);
+                            preview.RenderInfo.hiddenHealth = false;
+                            preview.Anim.PlayTransformAnimation();
+                            yield return new WaitForSeconds(0.15f);
+                            preview.SetInfo(preview.Info);
+                            yield return new WaitForSeconds(0.25f);
+                        } else
+                        {
+                            CardModificationInfo addTo2 = new CardModificationInfo
+                            {
+                                healthAdjustment = 1
+                            };
+                            preview.Info.Mods.Add(addTo2);
+                        }
                         // Sigils
                         yield return CreateSigilCard(__instance, preview);
                         preview.Anim.PlayTransformAnimation();
@@ -661,8 +673,10 @@ namespace IGCCMod
                 {
                     Vector3 vector = GetCardIndexLoc(obj, i + 5);
                     CardInfo c = ScriptableObject.CreateInstance<CardInfo>();
-                    CardModificationInfo addTo = new CardModificationInfo();
-                    addTo.nameReplacement = ((CardComplexity)i).ToString();
+                    CardModificationInfo addTo = new CardModificationInfo
+                    {
+                        nameReplacement = ((CardComplexity)i).ToString()
+                    };
                     c.cardComplexity = ((CardComplexity)i);
                     c.Mods.Add(addTo);
                     choices.Add(c);
@@ -998,14 +1012,18 @@ namespace IGCCMod
                 {
                     if (type == 0)
                     {
-                        preview.Info.evolveParams = new EvolveParams();
-                        preview.Info.evolveParams.evolution = selectedCard.Info;
-                        preview.Info.evolveParams.turnsToEvolve = 1;
+                        preview.Info.evolveParams = new EvolveParams
+                        {
+                            evolution = selectedCard.Info,
+                            turnsToEvolve = 1
+                        };
                     }
                     else if (type == 1)
                     {
-                        preview.Info.iceCubeParams = new IceCubeParams();
-                        preview.Info.iceCubeParams.creatureWithin = selectedCard.Info;
+                        preview.Info.iceCubeParams = new IceCubeParams
+                        {
+                            creatureWithin = selectedCard.Info
+                        };
                     }
                 }
                 yield return PostCardSelect(cards, selectedCard, 6);
@@ -1028,8 +1046,10 @@ namespace IGCCMod
                     else addTo.nameReplacement = i + 1 + " turns";
                     addTo.abilities.Add(Ability.Evolve);
                     c.Mods.Add(addTo);
-                    c.evolveParams = new EvolveParams();
-                    c.evolveParams.turnsToEvolve = i + 1;
+                    c.evolveParams = new EvolveParams
+                    {
+                        turnsToEvolve = i + 1
+                    };
                     choices.Add(c);
                     SelectableCard selectableCard = CreateCard(__instance, choices, cards, vector, true, true, false);
                     selectableCard.CursorSelectEnded = (Action<MainInputInteractable>)Delegate.Combine(selectableCard.CursorSelectEnded, (Action<MainInputInteractable>)delegate (MainInputInteractable c2)
@@ -1154,10 +1174,12 @@ namespace IGCCMod
                     }
                 }
                 Singleton<TextDisplayer>.Instance.Clear();
-                CardModificationInfo addTo2 = new CardModificationInfo();
-                addTo2.attackAdjustment = selectedCard.Info.Attack;
-                addTo2.statIcon = selectedCard.Info.SpecialStatIcon;
-                addTo2.specialAbilities = selectedCard.Info.SpecialAbilities;
+                CardModificationInfo addTo2 = new CardModificationInfo
+                {
+                    attackAdjustment = selectedCard.Info.Attack,
+                    statIcon = selectedCard.Info.SpecialStatIcon,
+                    specialAbilities = selectedCard.Info.SpecialAbilities
+                };
                 preview.Info.Mods.Add(addTo2);
                 yield return PostCardSelect(cards, selectedCard, 1);
             }
@@ -1239,8 +1261,10 @@ namespace IGCCMod
                     }
                 }
                 Singleton<TextDisplayer>.Instance.Clear();
-                CardModificationInfo addTo2 = new CardModificationInfo();
-                addTo2.healthAdjustment = selectedCard.Info.Health;
+                CardModificationInfo addTo2 = new CardModificationInfo
+                {
+                    healthAdjustment = selectedCard.Info.Health
+                };
                 preview.Info.Mods.Add(addTo2);
                 yield return PostCardSelect(cards, selectedCard, 2);
             }
@@ -1270,8 +1294,10 @@ namespace IGCCMod
                 // Create confirm card
                 Vector3 vectorP = GetCardIndexLoc(objP, 18);
                 CardInfo cP = ScriptableObject.CreateInstance<CardInfo>();
-                CardModificationInfo addToP = new CardModificationInfo();
-                addToP.nameReplacement = "confirm";
+                CardModificationInfo addToP = new CardModificationInfo
+                {
+                    nameReplacement = "confirm"
+                };
                 cP.Mods.Add(addToP);
                 cP.appearanceBehaviour.Add(CardAppearanceBehaviour.Appearance.RareCardBackground);
                 SelectableCard confirm = CreateConfirmCard(__instance, vectorP, cP);
@@ -1409,8 +1435,10 @@ namespace IGCCMod
                     }
                 }
                 Singleton<TextDisplayer>.Instance.Clear();
-                CardModificationInfo addTo2 = new CardModificationInfo();
-                addTo2.abilities = selectedSigils;
+                CardModificationInfo addTo2 = new CardModificationInfo
+                {
+                    abilities = selectedSigils
+                };
                 preview.Info.Mods.Add(addTo2);
                 confirm.Anim.PlayDeathAnimation();
                 UnityEngine.Object.Destroy(confirm.gameObject, 2f);
@@ -1441,8 +1469,10 @@ namespace IGCCMod
                 Transform objP = ((List<Transform>)__instance.GetType().GetField("cardPositionMarkers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(__instance))[0];
                 Vector3 vectorP = GetCardIndexLoc(objP, 18);
                 CardInfo cP = ScriptableObject.CreateInstance<CardInfo>();
-                CardModificationInfo addToP = new CardModificationInfo();
-                addToP.nameReplacement = "confirm";
+                CardModificationInfo addToP = new CardModificationInfo
+                {
+                    nameReplacement = "confirm"
+                };
                 cP.Mods.Add(addToP);
                 cP.appearanceBehaviour.Add(CardAppearanceBehaviour.Appearance.RareCardBackground);
                 SelectableCard confirm = CreateConfirmCard(__instance, vectorP, cP);
@@ -1554,14 +1584,16 @@ namespace IGCCMod
                     {
                         if (selectedCard.Info.SpecialAbilities.Count > 0 && selectedSAs.Contains(selectedCard.Info.SpecialAbilities[0]) || selectedCard.Info.traits.Count > 0 && selectedTraits.Contains(selectedCard.Info.traits[0]))
                         {
-                            selectedSAs.Remove(selectedCard.Info.SpecialAbilities[0]);
+                            if (selectedCard.Info.SpecialAbilities.Count > 0) selectedSAs.Remove(selectedCard.Info.SpecialAbilities[0]);
+                            else selectedTraits.Remove(selectedCard.Info.traits[0]);
                             selectedCard.Anim.PlayDeathAnimation();
                             DestroyAllCards(cards, false);
                             instantSpawn = true;
                         }
                         else
                         {
-                            selectedSAs.Add(selectedCard.Info.SpecialAbilities[0]);
+                            if (selectedCard.Info.SpecialAbilities.Count > 0) selectedSAs.Add(selectedCard.Info.SpecialAbilities[0]);
+                            else selectedTraits.Add(selectedCard.Info.traits[0]);
                             selectedCard.Info.appearanceBehaviour.Add(CardAppearanceBehaviour.Appearance.GoldEmission);
                             selectedCard.Anim.PlayTransformAnimation();
                             yield return new WaitForSeconds(0.15f);
@@ -1572,8 +1604,10 @@ namespace IGCCMod
                     }
                 }
                 Singleton<TextDisplayer>.Instance.Clear();
-                CardModificationInfo addTo2 = new CardModificationInfo();
-                addTo2.specialAbilities = selectedSAs;
+                CardModificationInfo addTo2 = new CardModificationInfo
+                {
+                    specialAbilities = selectedSAs
+                };
                 preview.Info.Mods.Add(addTo2);
                 preview.Info.traits = selectedTraits;
                 confirm.Anim.PlayDeathAnimation();
@@ -1595,8 +1629,10 @@ namespace IGCCMod
                 Transform objP = ((List<Transform>)__instance.GetType().GetField("cardPositionMarkers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(__instance))[0];
                 Vector3 vectorP = GetCardIndexLoc(objP, 18);
                 CardInfo cP = ScriptableObject.CreateInstance<CardInfo>();
-                CardModificationInfo addToP = new CardModificationInfo();
-                addToP.nameReplacement = "confirm";
+                CardModificationInfo addToP = new CardModificationInfo
+                {
+                    nameReplacement = "confirm"
+                };
                 cP.Mods.Add(addToP);
                 cP.appearanceBehaviour.Add(CardAppearanceBehaviour.Appearance.RareCardBackground);
                 SelectableCard confirm = CreateConfirmCard(__instance, vectorP, cP);
