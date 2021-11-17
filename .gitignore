@@ -1,7 +1,9 @@
 .vs/
 obj/
-bin/*
-!bin/IGCCMod.dll
+*.dll
+*.pdb
+!IGCCMod.dll
+!UtilMod.dll
 Properties/
 lib/*
 !lib/Sirenix.Serialization.dll
