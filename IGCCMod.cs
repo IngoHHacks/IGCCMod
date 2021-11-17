@@ -46,14 +46,16 @@ namespace IGCCMod
             }
         }
 
+
         [HarmonyPatch(typeof(SanctumSceneSequencer), "IntroSequence")]
         public class SanctumIntroPatch : SanctumSceneSequencer
         {
             public static bool Prefix(SanctumSceneSequencer __instance)
             {
                 // Cancel orignal method
-                if (SaveManager.SaveFile.currentRun.causeOfDeath.opponentType == Opponent.Type.PixelP03FinaleBoss) return false;
-                else return true;
+                return false;
+                //if (SaveManager.SaveFile.currentRun.causeOfDeath.opponentType == Opponent.Type.PixelP03FinaleBoss) return false;
+                //else return true;
             }
         }
 
@@ -62,23 +64,23 @@ namespace IGCCMod
         {
             public static IEnumerator Postfix(IEnumerator __result, SanctumSceneSequencer __instance)
             {
-                if (SaveManager.SaveFile.currentRun.causeOfDeath.opponentType == Opponent.Type.PixelP03FinaleBoss)
+                //if (SaveManager.SaveFile.currentRun.causeOfDeath.opponentType == Opponent.Type.PixelP03FinaleBoss)
+                //{
+                // Abbreviated version of original method.
+                __instance.GetType().GetMethod("StartHumLoop", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(__instance, null);
+                __instance.GetType().GetMethod("InitializeLeshy", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(__instance, null);
+                Singleton<ViewManager>.Instance.SwitchToView(View.SanctumFloorDown, immediate: true, lockAfter: true);
+                yield return new WaitForSeconds(1.5f);
+                yield return Singleton<UIManager>.Instance.Effects.GetEffect<EyelidMaskEffect>().Blink(delegate
                 {
-                    // Abbreviated version of original method.
-                    __instance.GetType().GetMethod("StartHumLoop", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(__instance, null);
-                    __instance.GetType().GetMethod("InitializeLeshy", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(__instance, null);
-                    Singleton<ViewManager>.Instance.SwitchToView(View.SanctumFloorDown, immediate: true, lockAfter: true);
-                    yield return new WaitForSeconds(1.5f);
-                    yield return Singleton<UIManager>.Instance.Effects.GetEffect<EyelidMaskEffect>().Blink(delegate
-                    {
-                        Singleton<CameraEffects>.Instance.TweenBlur(0f, 3f);
-                    });
-                    LookUp();
-                    Singleton<InteractionCursor>.Instance.SetHidden(hidden: false);
-                    yield return new WaitForSeconds(0.5f);
-                    yield return Singleton<TextDisplayer>.Instance.ShowUntilInput("You entered the [c:bR]card creation[c:] mode.");
-                    yield return __instance.GetType().GetMethod("DeathCardSequence", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(__instance, null);
-                }
+                    Singleton<CameraEffects>.Instance.TweenBlur(0f, 3f);
+                });
+                LookUp();
+                Singleton<InteractionCursor>.Instance.SetHidden(hidden: false);
+                yield return new WaitForSeconds(0.5f);
+                yield return Singleton<TextDisplayer>.Instance.ShowUntilInput("You entered the [c:bR]card creation[c:] mode.");
+                yield return __instance.GetType().GetMethod("DeathCardSequence", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(__instance, null);
+                //}
             }
         }
 
@@ -107,8 +109,9 @@ namespace IGCCMod
             public static bool Prefix(SanctumSceneSequencer __instance)
             {
                 // Cancel orignal method
-                if (SaveManager.SaveFile.currentRun.causeOfDeath.opponentType == Opponent.Type.PixelP03FinaleBoss) return false;
-                else return true;
+                return false;
+                //if (SaveManager.SaveFile.currentRun.causeOfDeath.opponentType == Opponent.Type.PixelP03FinaleBoss) return false;
+                //else return true;
             }
         }
 
@@ -117,11 +120,11 @@ namespace IGCCMod
         {
             public static IEnumerator Postfix(IEnumerator __result, SanctumSceneSequencer __instance, DeathCardCreationSequencer ___deathCardSequencer)
             {
-                if (SaveManager.SaveFile.currentRun.causeOfDeath.opponentType == Opponent.Type.PixelP03FinaleBoss)
-                {
-                    yield return new WaitForSeconds(0.25f);
-                    yield return ___deathCardSequencer.CreateCardSequence(true);
-                }
+                //if (SaveManager.SaveFile.currentRun.causeOfDeath.opponentType == Opponent.Type.PixelP03FinaleBoss)
+                //{
+                yield return new WaitForSeconds(0.25f);
+                yield return ___deathCardSequencer.CreateCardSequence(true);
+                //}
             }
         }
 
@@ -132,8 +135,9 @@ namespace IGCCMod
             public static bool Prefix(DeathCardCreationSequencer __instance)
             {
                 // Cancel orignal method
-                if (SaveManager.SaveFile.currentRun.causeOfDeath.opponentType == Opponent.Type.PixelP03FinaleBoss) return false;
-                else return true;
+                return false;
+                //if (SaveManager.SaveFile.currentRun.causeOfDeath.opponentType == Opponent.Type.PixelP03FinaleBoss) return false;
+                //else return true;
             }
         }
 
@@ -142,192 +146,192 @@ namespace IGCCMod
         {
             public static IEnumerator Postfix(IEnumerator __result, DeathCardCreationSequencer __instance, KeyboardInputHandler ___keyboardInput)
             {
-                if (SaveManager.SaveFile.currentRun.causeOfDeath.opponentType == Opponent.Type.PixelP03FinaleBoss)
+                //if (SaveManager.SaveFile.currentRun.causeOfDeath.opponentType == Opponent.Type.PixelP03FinaleBoss)
+                //{
+                bool done = false;
+                while (!done)
                 {
-                    Boolean done = false;
-                    while (!done)
+                    // Create preview card
+                    Transform obj = ((List<Transform>)__instance.GetType().GetField("cardPositionMarkers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(__instance))[0];
+                    Vector3 vector = GetCardIndexLoc(obj, 17);
+                    CardInfo c = ScriptableObject.CreateInstance<CardInfo>();
+                    CardModificationInfo addTo = new CardModificationInfo
                     {
-                        // Create preview card
-                        Transform obj = ((List<Transform>)__instance.GetType().GetField("cardPositionMarkers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(__instance))[0];
-                        Vector3 vector = GetCardIndexLoc(obj, 17);
-                        CardInfo c = ScriptableObject.CreateInstance<CardInfo>();
-                        CardModificationInfo addTo = new CardModificationInfo
-                        {
-                            nameReplacement = "current card"
-                        };
-                        c.Mods.Add(addTo);
-                        SelectableCard preview = CreatePreviewCard(__instance, vector, c);
-                        // Cost
-                        yield return CreateCostCard(__instance, preview);
-                        preview.Anim.PlayTransformAnimation();
-                        yield return new WaitForSeconds(0.15f);
-                        preview.SetInfo(preview.Info);
-                        yield return new WaitForSeconds(0.25f);
-                        // Attack
-                        yield return CreateAttackCard(__instance, preview);
-                        preview.RenderInfo.hiddenAttack = false;
-                        preview.Anim.PlayTransformAnimation();
-                        yield return new WaitForSeconds(0.15f);
-                        preview.SetInfo(preview.Info);
-                        yield return new WaitForSeconds(0.25f);
-                        // Health
-                        if (!preview.Info.SpecialAbilities.Contains(SpecialTriggeredAbility.Lammergeier))
-                        {
-                            yield return CreateHealthCard(__instance, preview);
-                            preview.RenderInfo.hiddenHealth = false;
-                            preview.Anim.PlayTransformAnimation();
-                            yield return new WaitForSeconds(0.15f);
-                            preview.SetInfo(preview.Info);
-                            yield return new WaitForSeconds(0.25f);
-                        }
-                        // Sigils
-                        yield return CreateSigilCard(__instance, preview);
-                        preview.Anim.PlayTransformAnimation();
-                        yield return new WaitForSeconds(0.15f);
-                        preview.SetInfo(preview.Info);
-                        yield return new WaitForSeconds(0.25f);
-                        if (preview.Info.Abilities.Contains(Ability.Evolve) || preview.Info.Abilities.Contains(Ability.Transformer))
-                        {
-                            // Evolution
-                            yield return CreateEvolution(__instance, preview, 0);
-                            preview.Anim.PlayTransformAnimation();
-                            yield return new WaitForSeconds(0.15f);
-                            preview.SetInfo(preview.Info);
-                            yield return new WaitForSeconds(0.25f);
-                            if (preview.Info.evolveParams != null)
-                            {
-                                yield return CreateEvolutionTurnCount(__instance, preview);
-                                preview.Anim.PlayTransformAnimation();
-                                yield return new WaitForSeconds(0.15f);
-                                preview.SetInfo(preview.Info);
-                                yield return new WaitForSeconds(0.25f);
-                            }
-                        }
-                        if (preview.Info.Abilities.Contains(Ability.IceCube))
-                        {
-                            // Ice cube
-                            yield return CreateEvolution(__instance, preview, 1);
-                            preview.Anim.PlayTransformAnimation();
-                            yield return new WaitForSeconds(0.15f);
-                            preview.SetInfo(preview.Info);
-                            yield return new WaitForSeconds(0.25f);
-                        }
-                        // Tribe
-                        yield return CreateTribeCard(__instance, preview);
-                        preview.Anim.PlayTransformAnimation();
-                        yield return new WaitForSeconds(0.15f);
-                        preview.SetInfo(preview.Info);
-                        yield return new WaitForSeconds(0.25f);
-                        // Special Abilities
-                        yield return CreateSpecialAbilities(__instance, preview);
-                        preview.Anim.PlayTransformAnimation();
-                        yield return new WaitForSeconds(0.15f);
-                        preview.SetInfo(preview.Info);
-                        yield return new WaitForSeconds(0.25f);
-                        // Load textures from cards
-                        // TODO: Remove duplicates
-                        Texture2D[] textures = (Texture2D[])Resources.FindObjectsOfTypeAll(typeof(Texture2D));
-                        List<Texture2D> validTextures = new List<Texture2D>();
-                        int baseCount = 0;
-                        foreach (Texture2D texture in textures)
-                        {
-                            if (texture.width == 114 && texture.height == 94 && texture.name.StartsWith("portrait") && !texture.name.EndsWith("_emission"))
-                            {
-                                validTextures.Add(texture);
-                                baseCount++;
-                            }
-                        }
-                        int modCount = 0;
-                        foreach (string file in Directory.GetFiles(Paths.PluginPath, "*.png", SearchOption.AllDirectories))
-                        {
-
-                            byte[] pngBytes = System.IO.File.ReadAllBytes(file);
-                            Texture2D texture = new Texture2D(2, 2);
-                            ImageConversion.LoadImage(texture, pngBytes);
-                            texture.name = file;
-                            if (texture.width == 114 && texture.height == 94 && !texture.name.EndsWith("_emission"))
-                            {
-                                validTextures.Add(texture);
-                                modCount++;
-                            }
-                        }
-                        // Portrait
-                        yield return CreatePortrait(__instance, preview, validTextures, baseCount, modCount);
-                        preview.Anim.PlayTransformAnimation();
-                        yield return new WaitForSeconds(0.15f);
-                        preview.SetInfo(preview.Info);
-                        yield return new WaitForSeconds(0.25f);
-                        // Rarity
-                        yield return CreateRarity(__instance, preview);
-                        preview.Anim.PlayTransformAnimation();
-                        yield return new WaitForSeconds(0.15f);
-                        preview.SetInfo(preview.Info);
-                        yield return new WaitForSeconds(0.25f);
-                        // Complexity
-                        yield return CreateComplexity(__instance, preview);
-                        preview.Anim.PlayTransformAnimation();
-                        yield return new WaitForSeconds(0.15f);
-                        preview.SetInfo(preview.Info);
-                        yield return new WaitForSeconds(0.25f);
-                        // Move to center
-                        Vector3 vector2 = GetCardIndexLoc(obj, 7);
-                        Pixelplacement.Tween.Position(preview.transform, vector2, 0.25f, 0f);
-
-                        // Enter name
-                        ___keyboardInput.maxInputLength = 255;
-                        Singleton<TextDisplayer>.Instance.ShowMessage("You should give it a name.");
-                        CardModificationInfo nameMod = new CardModificationInfo();
-                        preview.Info.Mods.Add(nameMod);
-                        yield return __instance.GetType().GetMethod("EnterNameForCard", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(__instance, new object[] { preview, nameMod });
-                        yield return Singleton<TextDisplayer>.Instance.ShowUntilInput("[c:bR]" + nameMod.nameReplacement.Trim() + "[c:]?");
-                        yield return new WaitForSeconds(0.25f);
-
-                        // Enter description
-                        ___keyboardInput.maxInputLength = 1027;
-                        Singleton<TextDisplayer>.Instance.ShowMessage("Please type the description.");
-                        yield return EnterDescription(___keyboardInput, preview);
-                        yield return new WaitForSeconds(0.25f);
-                        yield return FinalizeCard(__instance, preview);
-                        // Finalize
-                        if (preview == null)
-                        {
-                            // End
-                            done = true;
-                        }
-                        else
-                        {
-                            // Restart
-                            preview.Anim.PlayDeathAnimation();
-                            UnityEngine.Object.Destroy(preview.gameObject, 2f);
-                            yield return new WaitForSeconds(0.25f);
-                        }
-
-                    }
-                    // Take photo and return to table
-                    yield return new WaitForSeconds(0.5f);
-                    yield return Singleton<TextDisplayer>.Instance.ShowMessage("It is time for you to return.");
-                    LookUp();
-                    yield return new WaitForSeconds(0.5f);
-                    LeshyAnimationController.Instance.LeftArm.PlayAnimation("takephoto_left");
-                    yield return new WaitForSeconds(1.5f);
-                    if (UnityEngine.Random.value > 0.8f)
+                        nameReplacement = "current card"
+                    };
+                    c.Mods.Add(addTo);
+                    SelectableCard preview = CreatePreviewCard(__instance, vector, c);
+                    // Cost
+                    yield return CreateCostCard(__instance, preview);
+                    preview.Anim.PlayTransformAnimation();
+                    yield return new WaitForSeconds(0.15f);
+                    preview.SetInfo(preview.Info);
+                    yield return new WaitForSeconds(0.25f);
+                    // Attack
+                    yield return CreateAttackCard(__instance, preview);
+                    preview.RenderInfo.hiddenAttack = false;
+                    preview.Anim.PlayTransformAnimation();
+                    yield return new WaitForSeconds(0.15f);
+                    preview.SetInfo(preview.Info);
+                    yield return new WaitForSeconds(0.25f);
+                    // Health
+                    if (!preview.Info.SpecialAbilities.Contains(SpecialTriggeredAbility.Lammergeier))
                     {
-                        Singleton<VideoCameraRig>.Instance.PlayCameraAnim("refocus_medium");
+                        yield return CreateHealthCard(__instance, preview);
+                        preview.RenderInfo.hiddenHealth = false;
+                        preview.Anim.PlayTransformAnimation();
+                        yield return new WaitForSeconds(0.15f);
+                        preview.SetInfo(preview.Info);
+                        yield return new WaitForSeconds(0.25f);
                     }
-                    LeshyAnimationController.Instance.LeftArm.SetTrigger("photo_flare");
-                    yield return new WaitForSeconds(1f);
-                    Singleton<TextDisplayer>.Instance.Clear();
-                    AudioSource audioSource = AudioController.Instance.PlaySound2D("camera_flash_gameover", MixerGroup.None, 0.85f);
-                    audioSource.gameObject.name = "flashSound";
-                    UnityEngine.Object.DontDestroyOnLoad(audioSource.gameObject);
-                    AudioController.Instance.StopAllLoops();
-                    Singleton<UIManager>.Instance.Effects.GetEffect<ScreenColorEffect>().SetColor(GameColors.Instance.nearWhite);
-                    Singleton<UIManager>.Instance.Effects.GetEffect<ScreenColorEffect>().SetIntensity(1f, 100f);
-                    yield return new WaitForSeconds(1f);
-                    AsyncOperation asyncOp = SceneLoader.StartAsyncLoad("Part1_Cabin");
-                    SceneLoader.CompleteAsyncLoad(asyncOp);
-                    SaveManager.SaveToFile(saveActiveScene: false);
+                    // Sigils
+                    yield return CreateSigilCard(__instance, preview);
+                    preview.Anim.PlayTransformAnimation();
+                    yield return new WaitForSeconds(0.15f);
+                    preview.SetInfo(preview.Info);
+                    yield return new WaitForSeconds(0.25f);
+                    if (preview.Info.Abilities.Contains(Ability.Evolve) || preview.Info.Abilities.Contains(Ability.Transformer))
+                    {
+                        // Evolution
+                        yield return CreateEvolution(__instance, preview, 0);
+                        preview.Anim.PlayTransformAnimation();
+                        yield return new WaitForSeconds(0.15f);
+                        preview.SetInfo(preview.Info);
+                        yield return new WaitForSeconds(0.25f);
+                        if (preview.Info.evolveParams != null)
+                        {
+                            yield return CreateEvolutionTurnCount(__instance, preview);
+                            preview.Anim.PlayTransformAnimation();
+                            yield return new WaitForSeconds(0.15f);
+                            preview.SetInfo(preview.Info);
+                            yield return new WaitForSeconds(0.25f);
+                        }
+                    }
+                    if (preview.Info.Abilities.Contains(Ability.IceCube))
+                    {
+                        // Ice cube
+                        yield return CreateEvolution(__instance, preview, 1);
+                        preview.Anim.PlayTransformAnimation();
+                        yield return new WaitForSeconds(0.15f);
+                        preview.SetInfo(preview.Info);
+                        yield return new WaitForSeconds(0.25f);
+                    }
+                    // Tribe
+                    yield return CreateTribeCard(__instance, preview);
+                    preview.Anim.PlayTransformAnimation();
+                    yield return new WaitForSeconds(0.15f);
+                    preview.SetInfo(preview.Info);
+                    yield return new WaitForSeconds(0.25f);
+                    // Special Abilities
+                    yield return CreateSpecialAbilities(__instance, preview);
+                    preview.Anim.PlayTransformAnimation();
+                    yield return new WaitForSeconds(0.15f);
+                    preview.SetInfo(preview.Info);
+                    yield return new WaitForSeconds(0.25f);
+                    // Load textures from cards
+                    // TODO: Remove duplicates
+                    Texture2D[] textures = (Texture2D[])Resources.FindObjectsOfTypeAll(typeof(Texture2D));
+                    List<Texture2D> validTextures = new List<Texture2D>();
+                    int baseCount = 0;
+                    foreach (Texture2D texture in textures)
+                    {
+                        if (texture.width == 114 && texture.height == 94 && texture.name.StartsWith("portrait") && !texture.name.EndsWith("_emission"))
+                        {
+                            validTextures.Add(texture);
+                            baseCount++;
+                        }
+                    }
+                    int modCount = 0;
+                    foreach (string file in Directory.GetFiles(Paths.PluginPath, "*.png", SearchOption.AllDirectories))
+                    {
+
+                        byte[] pngBytes = System.IO.File.ReadAllBytes(file);
+                        Texture2D texture = new Texture2D(2, 2);
+                        ImageConversion.LoadImage(texture, pngBytes);
+                        texture.name = file;
+                        if (texture.width == 114 && texture.height == 94 && !texture.name.EndsWith("_emission"))
+                        {
+                            validTextures.Add(texture);
+                            modCount++;
+                        }
+                    }
+                    // Portrait
+                    yield return CreatePortrait(__instance, preview, validTextures, baseCount, modCount);
+                    preview.Anim.PlayTransformAnimation();
+                    yield return new WaitForSeconds(0.15f);
+                    preview.SetInfo(preview.Info);
+                    yield return new WaitForSeconds(0.25f);
+                    // Rarity
+                    yield return CreateRarity(__instance, preview);
+                    preview.Anim.PlayTransformAnimation();
+                    yield return new WaitForSeconds(0.15f);
+                    preview.SetInfo(preview.Info);
+                    yield return new WaitForSeconds(0.25f);
+                    // Complexity
+                    yield return CreateComplexity(__instance, preview);
+                    preview.Anim.PlayTransformAnimation();
+                    yield return new WaitForSeconds(0.15f);
+                    preview.SetInfo(preview.Info);
+                    yield return new WaitForSeconds(0.25f);
+                    // Move to center
+                    Vector3 vector2 = GetCardIndexLoc(obj, 7);
+                    Pixelplacement.Tween.Position(preview.transform, vector2, 0.25f, 0f);
+
+                    // Enter name
+                    ___keyboardInput.maxInputLength = 255;
+                    Singleton<TextDisplayer>.Instance.ShowMessage("You should give it a name.");
+                    CardModificationInfo nameMod = new CardModificationInfo();
+                    preview.Info.Mods.Add(nameMod);
+                    yield return __instance.GetType().GetMethod("EnterNameForCard", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(__instance, new object[] { preview, nameMod });
+                    yield return Singleton<TextDisplayer>.Instance.ShowUntilInput("[c:bR]" + nameMod.nameReplacement.Trim() + "[c:]?");
+                    yield return new WaitForSeconds(0.25f);
+
+                    // Enter description
+                    ___keyboardInput.maxInputLength = 1027;
+                    Singleton<TextDisplayer>.Instance.ShowMessage("Please type the description.");
+                    yield return EnterDescription(___keyboardInput, preview);
+                    yield return new WaitForSeconds(0.25f);
+                    yield return FinalizeCard(__instance, preview);
+                    // Finalize
+                    if (preview == null)
+                    {
+                        // End
+                        done = true;
+                    }
+                    else
+                    {
+                        // Restart
+                        preview.Anim.PlayDeathAnimation();
+                        UnityEngine.Object.Destroy(preview.gameObject, 2f);
+                        yield return new WaitForSeconds(0.25f);
+                    }
+
                 }
+                // Take photo and return to table
+                yield return new WaitForSeconds(0.5f);
+                yield return Singleton<TextDisplayer>.Instance.ShowMessage("It is time for you to return.");
+                LookUp();
+                yield return new WaitForSeconds(0.5f);
+                LeshyAnimationController.Instance.LeftArm.PlayAnimation("takephoto_left");
+                yield return new WaitForSeconds(1.5f);
+                if (UnityEngine.Random.value > 0.8f)
+                {
+                    Singleton<VideoCameraRig>.Instance.PlayCameraAnim("refocus_medium");
+                }
+                LeshyAnimationController.Instance.LeftArm.SetTrigger("photo_flare");
+                yield return new WaitForSeconds(1f);
+                Singleton<TextDisplayer>.Instance.Clear();
+                AudioSource audioSource = AudioController.Instance.PlaySound2D("camera_flash_gameover", MixerGroup.None, 0.85f);
+                audioSource.gameObject.name = "flashSound";
+                UnityEngine.Object.DontDestroyOnLoad(audioSource.gameObject);
+                AudioController.Instance.StopAllLoops();
+                Singleton<UIManager>.Instance.Effects.GetEffect<ScreenColorEffect>().SetColor(GameColors.Instance.nearWhite);
+                Singleton<UIManager>.Instance.Effects.GetEffect<ScreenColorEffect>().SetIntensity(1f, 100f);
+                yield return new WaitForSeconds(1f);
+                AsyncOperation asyncOp = SceneLoader.StartAsyncLoad("Part1_Cabin");
+                SceneLoader.CompleteAsyncLoad(asyncOp);
+                SaveManager.SaveToFile(saveActiveScene: false);
+                //}
             }
 
             private static IEnumerator EnterDescription(KeyboardInputHandler ___keyboardInput, SelectableCard preview)
