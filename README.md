@@ -9,11 +9,11 @@ Discord: **IngoH#3923**<br>
 - Loading portraits from online database.
 
 ### Known Bugs ###
-- Hidden cards appear in card selections if the game is not restarted. (Might be due to API; might be fixed)
 - Some game-crashing abilites can be chosen.
 - Some options are missing.
 - Regular death card creation doesn't work.
 - Portraits can contain duplicates.
+- Some properties do not show up correctly (Won't fix)
 
 ### Other Notes ###
 - All portraits are exported to a new file, regardless of whether it already exists as a file.
