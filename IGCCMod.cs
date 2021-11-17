@@ -179,13 +179,6 @@ namespace IGCCMod
                             yield return new WaitForSeconds(0.15f);
                             preview.SetInfo(preview.Info);
                             yield return new WaitForSeconds(0.25f);
-                        } else
-                        {
-                            CardModificationInfo addTo2 = new CardModificationInfo
-                            {
-                                healthAdjustment = 1
-                            };
-                            preview.Info.Mods.Add(addTo2);
                         }
                         // Sigils
                         yield return CreateSigilCard(__instance, preview);
