@@ -8,3 +8,4 @@ Properties/
 lib/*
 !lib/Sirenix.Serialization.dll
 IGCCMod.sln
+IGCCMod.csproj.user
