@@ -11,3 +11,4 @@ Discord: **IngoH#3923**<br>
 - Hidden cards appear in card selections if the game is not restarted. (Might be due to API; might be fixed)
 - Some game-crashing abilites can be chosen.
 - Some options are missing.
+- Regular death card creation doesn't work.
