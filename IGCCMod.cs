@@ -1779,7 +1779,7 @@ namespace IGCCMod
                         UnityEngine.Object.Destroy(item2.gameObject, 2f);
                     }
                 }
-                string examineDialogue = "...";
+                string examineDialogue = "";
                 if (selectedSAs.Count > 0)
                 {
                     string args = "";
@@ -1834,7 +1834,8 @@ namespace IGCCMod
                             }
                         }
                     }
-                    examineDialogue = string.Format(Localization.Translate("A [c:bR]Trait of {0}[c:]."), args);
+                    if (examineDialogue != "") examineDialogue += " ";
+                    examineDialogue += string.Format(Localization.Translate("A [c:bR]Trait of {0}[c:]."), args);
                 }
                 if (selectedSAs.Count == 0 && selectedTraits.Count == 0) examineDialogue = string.Format(Localization.Translate("[c:bR]No Special Abilities. No Traits[c:]."));
                 LookUp();
