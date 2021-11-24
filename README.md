@@ -7,6 +7,11 @@ The utility DLL contains features such as unlocking the painting when looking at
 
 **To access the card creator, use the backroom door handle.**<br>
 
+### Changelog ###
+#### 1.1.0
+Update to API 1.12/JSONLoader 1.7
+Created cards no longer temporarily increase spawn rates.
+
 ### Planned Features ###
 - Editing/deleting existing cards.
 - Config for adding card to deck/increased spawn rates.

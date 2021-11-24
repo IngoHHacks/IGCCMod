@@ -19,7 +19,7 @@ namespace IGCCMod
     {
         private const string PluginGuid = "IngoH.inscryption.IGCCMod";
         private const string PluginName = "IGCCMod";
-        private const string PluginVersion = "1.0.0";
+        private const string PluginVersion = "1.1.0";
 
         internal static ManualLogSource Log;
 
@@ -503,28 +503,26 @@ namespace IGCCMod
                     yield return Singleton<TextDisplayer>.Instance.ShowMessage("Exporting card...");
                     string name = "IGCC_" + Regex.Replace(preview.Info.DisplayedNameEnglish.Replace(" ", "_"), "\\W", "_");
                     string json = JsonParser.ParseCard(name, preview);
-                    System.IO.Directory.CreateDirectory(Paths.PluginPath + "/JSONLoader/Cards");
-                    System.IO.File.WriteAllText(Paths.PluginPath + "/JSONLoader/Cards/" + name + ".json", json);
-                    System.IO.Directory.CreateDirectory(Paths.PluginPath + "/JSONLoader/Artwork");
-                    System.IO.File.WriteAllBytes(Paths.PluginPath + "/JSONLoader/Artwork/" + name + ".png", CloneTextureReadable(preview.Info.portraitTex.texture).EncodeToPNG());
-                    JLPlugin.Data.CardData card = JLPlugin.Data.CardData.CreateFromJSON(json);
+                    Directory.CreateDirectory(Paths.PluginPath + "/JSONLoader/Cards");
+                    File.WriteAllText(Paths.PluginPath + "/JSONLoader/Cards/" + name + ".jldr", json);
+                    Directory.CreateDirectory(Paths.PluginPath + "/JSONLoader/Artwork");
+                    File.WriteAllBytes(Paths.PluginPath + "/JSONLoader/Artwork/" + name + ".png", CloneTextureReadable(preview.Info.portraitTex.texture).EncodeToPNG());
+                    JLPlugin.Data.CardData card = JLPlugin.Utils.JLUtils.CreateFromJSON(json);
                     card.GenerateNew();
                     List<CardInfo> official = ScriptableObjectLoader<CardInfo>.AllData;
                     string orig = preview.Info.name;
+                    APIPlugin.NewCard.cards[APIPlugin.NewCard.cards.Count - 1].name = name;
                     APIPlugin.NewCard.cards[APIPlugin.NewCard.cards.Count - 1].evolveParams = preview.Info.evolveParams;
                     APIPlugin.NewCard.cards[APIPlugin.NewCard.cards.Count - 1].iceCubeParams = preview.Info.iceCubeParams;
                     if (preview.Info.metaCategories.Contains(CardMetaCategory.ChoiceNode) || preview.Info.metaCategories.Contains(CardMetaCategory.Rare))
                     {
-                        for (int i = 0; i < 10; i++)
-                        {
-                            official.Add(APIPlugin.NewCard.cards[APIPlugin.NewCard.cards.Count - 1]);
-                        }
+                        ScriptableObjectLoader<CardInfo>.AllData.Add(APIPlugin.NewCard.cards[APIPlugin.NewCard.cards.Count - 1]);
                         SaveManager.SaveFile.currentRun.playerDeck.AddCard(APIPlugin.NewCard.cards[APIPlugin.NewCard.cards.Count - 1]);
-                        yield return Singleton<TextDisplayer>.Instance.ShowUntilInput("The card has been created and added to your deck. It will also appear 10 times as often until the game is restarted.");
+                        yield return Singleton<TextDisplayer>.Instance.ShowUntilInput("The card has been created and added to your deck.");
                     }
                     else
                     {
-                        official.Add(APIPlugin.NewCard.cards[APIPlugin.NewCard.cards.Count - 1]);
+                        ScriptableObjectLoader<CardInfo>.AllData.Add(APIPlugin.NewCard.cards[APIPlugin.NewCard.cards.Count - 1]);
                         yield return Singleton<TextDisplayer>.Instance.ShowUntilInput("The card has been created.");
                     }
                     
@@ -532,7 +530,7 @@ namespace IGCCMod
                 if (selectedCard.Info.DisplayedNameEnglish.Contains("quit"))
                 {
                     preview.Anim.PlayDeathAnimation();
-                    UnityEngine.Object.Destroy(preview.gameObject, 0.5f);
+                    Destroy(preview.gameObject, 0.5f);
                     DestroyAllCards(cards, true);
                     yield return new WaitForSeconds(0.55f);
                 } else
