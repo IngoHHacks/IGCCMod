@@ -11,12 +11,12 @@ The utility DLL contains features such as unlocking the painting when looking at
 #### 1.1.0
 - Update to API 1.12/JSONLoader 1.7
 - Created cards no longer temporarily increase spawn rates.
+- Added some info and descriptions for card properties.
 
 ### Planned Features ###
 - Editing/deleting existing cards.
 - Config for adding card to deck/increased spawn rates.
 - Split IGCCMod and UtilMod
-- Add descriptions for card properties.
 - Loading portraits from online database.
 
 ### Known Bugs ###

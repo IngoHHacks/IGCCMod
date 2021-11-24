@@ -644,7 +644,7 @@ namespace IGCCMod
                         selectedCard = (SelectableCard)c2;
                     });
                 }
-                Singleton<TextDisplayer>.Instance.ShowMessage("Choose the [c:bR]complexity[c:] of card.");
+                Singleton<TextDisplayer>.Instance.ShowMessage("Choose the [c:bR]complexity[c:] of card. This determines when it is unlocked in the tutorial.");
                 foreach (SelectableCard item in cards)
                 {
                     item.SetInteractionEnabled(interactionEnabled: true);
@@ -1335,7 +1335,7 @@ namespace IGCCMod
                                 choices.Add(null);
                             }
                         }
-                        Singleton<TextDisplayer>.Instance.ShowMessage("Now choose some cards from which we will extract the [c:bR]sigils[c:].");
+                        Singleton<TextDisplayer>.Instance.ShowMessage("Now choose some cards from which we will extract the [c:bR]sigils[c:]. Note that some may not work correctly.");
                         foreach (SelectableCard item in cards)
                         {
                             item.SetInteractionEnabled(interactionEnabled: true);
@@ -1503,7 +1503,7 @@ namespace IGCCMod
                                 choices.Add(null);
                             }
                         }
-                        Singleton<TextDisplayer>.Instance.ShowMessage("Finally, choose the hidden [c:bR]special abilities[c:] and [c:bR]traits[c:].");
+                        Singleton<TextDisplayer>.Instance.ShowMessage("Finally, choose the hidden [c:bR]special abilities[c:] and [c:bR]traits[c:]. Again, some may not function properly.");
                         foreach (SelectableCard item in cards)
                         {
                             item.SetInteractionEnabled(interactionEnabled: true);
