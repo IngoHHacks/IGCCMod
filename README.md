@@ -10,7 +10,7 @@ The utility DLL contains features such as unlocking the painting when looking at
 ### Changelog ###
 #### 1.1.1
 - Renamed the incorrectly named 'cost' property to 'bloodCost'.
-<br>
+
 #### 1.1.0
 - Update to API 1.12/JSONLoader 1.7
 - Created cards no longer temporarily increase spawn rates.
