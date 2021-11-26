@@ -19,7 +19,7 @@ namespace IGCCMod
     {
         private const string PluginGuid = "IngoH.inscryption.IGCCMod";
         private const string PluginName = "IGCCMod";
-        private const string PluginVersion = "1.1.0";
+        private const string PluginVersion = "1.1.1";
 
         internal static ManualLogSource Log;
 
@@ -135,11 +135,11 @@ namespace IGCCMod
                     Vector3 pos = Instance.CameraParent.localPosition;
                     if (cameraOffset.z >= 0)
                     {
-                        Pixelplacement.Tween.LocalRotation(Singleton<ViewManager>.Instance.CameraParent, new Vector3(90, 0, 0), 0.25f, 0f, Pixelplacement.Tween.EaseInOut);
+                        Pixelplacement.Tween.LocalRotation(Instance.CameraParent, new Vector3(90, 0, 0), 0.25f, 0f, Pixelplacement.Tween.EaseInOut);
                     }
                     else
                     {
-                        Pixelplacement.Tween.LocalRotation(Singleton<ViewManager>.Instance.CameraParent, new Vector3(105, 0, 0), 0.25f, 0f, Pixelplacement.Tween.EaseInOut);
+                        Pixelplacement.Tween.LocalRotation(Instance.CameraParent, new Vector3(105, 0, 0), 0.25f, 0f, Pixelplacement.Tween.EaseInOut);
                     }
                     return false;
                 }
