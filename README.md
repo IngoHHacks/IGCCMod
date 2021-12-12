@@ -8,6 +8,9 @@ The utility DLL contains features such as unlocking the painting when looking at
 **To access the card creator, use the backroom door handle.**<br>
 
 ### Changelog ###
+#### 1.1.2
+- Fixed incompatibility with DialogRemover
+
 #### 1.1.1
 - Renamed the incorrectly named 'cost' property to 'bloodCost'.
 

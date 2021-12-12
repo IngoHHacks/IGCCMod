@@ -13,13 +13,14 @@ using UnityEngine;
 
 namespace IGCCMod
 {
-
     [BepInPlugin(PluginGuid, PluginName, PluginVersion)]
+    [BepInDependency("cyantist.inscryption.api", BepInDependency.DependencyFlags.HardDependency)]
+    [BepInDependency("MADH.inscryption.JSONLoader", BepInDependency.DependencyFlags.HardDependency)]
     public class Plugin : BaseUnityPlugin
     {
         private const string PluginGuid = "IngoH.inscryption.IGCCMod";
         private const string PluginName = "IGCCMod";
-        private const string PluginVersion = "1.1.1";
+        private const string PluginVersion = "1.1.2";
 
         internal static ManualLogSource Log;
 
@@ -1757,6 +1758,7 @@ namespace IGCCMod
                 }
                 // Destroy selected card
                 LookUp();
+                yield return new WaitForSeconds(0.25f);
                 yield return Singleton<TextDisplayer>.Instance.ShowUntilInput(examineDialogue);
                 LookDown();
                 selectedCard.Anim.PlayDeathAnimation();
@@ -1837,6 +1839,7 @@ namespace IGCCMod
                 }
                 if (selectedSAs.Count == 0 && selectedTraits.Count == 0) examineDialogue = string.Format(Localization.Translate("[c:bR]No Special Abilities. No Traits[c:]."));
                 LookUp();
+                yield return new WaitForSeconds(0.25f);
                 yield return Singleton<TextDisplayer>.Instance.ShowUntilInput(examineDialogue);
                 LookDown();
                 foreach (SelectableCard item2 in cards)
@@ -1899,6 +1902,7 @@ namespace IGCCMod
                     examineDialogue = string.Format(Localization.Translate("[c:bR]No Sigils[c:]."));
                 }
                 LookUp();
+                yield return new WaitForSeconds(0.25f);
                 yield return Singleton<TextDisplayer>.Instance.ShowUntilInput(examineDialogue);
                 LookDown();
                 foreach (SelectableCard item2 in cards)
@@ -1962,6 +1966,7 @@ namespace IGCCMod
                     examineDialogue = string.Format(Localization.Translate("[c:bR]No Tribes[c:]."));
                 }
                 LookUp();
+                yield return new WaitForSeconds(0.25f);
                 yield return Singleton<TextDisplayer>.Instance.ShowUntilInput(examineDialogue);
                 LookDown();
                 foreach (SelectableCard item2 in cards)
