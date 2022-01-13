@@ -1,4 +1,5 @@
-﻿using BepInEx;
+﻿using APIPlugin;
+using BepInEx;
 using BepInEx.Logging;
 using DiskCardGame;
 using HarmonyLib;
@@ -7,6 +8,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using UnityEngine;
@@ -20,7 +22,7 @@ namespace IGCCMod
     {
         private const string PluginGuid = "IngoH.inscryption.IGCCMod";
         private const string PluginName = "IGCCMod";
-        private const string PluginVersion = "1.1.2";
+        private const string PluginVersion = "1.2.0";
 
         internal static ManualLogSource Log;
 
@@ -505,7 +507,7 @@ namespace IGCCMod
                     string name = "IGCC_" + Regex.Replace(preview.Info.DisplayedNameEnglish.Replace(" ", "_"), "\\W", "_");
                     string json = JsonParser.ParseCard(name, preview);
                     Directory.CreateDirectory(Paths.PluginPath + "/JSONLoader/Cards");
-                    File.WriteAllText(Paths.PluginPath + "/JSONLoader/Cards/" + name + ".jldr", json);
+                    File.WriteAllText(Paths.PluginPath + "/JSONLoader/Cards/" + name + "_card.jldr", json);
                     Directory.CreateDirectory(Paths.PluginPath + "/JSONLoader/Artwork");
                     File.WriteAllBytes(Paths.PluginPath + "/JSONLoader/Artwork/" + name + ".png", CloneTextureReadable(preview.Info.portraitTex.texture).EncodeToPNG());
                     JLPlugin.Data.CardData card = JLPlugin.Utils.JLUtils.CreateFromJSON(json);
@@ -1229,17 +1231,15 @@ namespace IGCCMod
                 SelectableCard selectedCard = null;
                 List<Ability> selectedSigils = new List<Ability>();
                 List<SelectableCard> cards = new List<SelectableCard>();
-                List<Ability> abilities = new List<Ability>();
-                List<Ability> baseAbilities = new List<Ability>();
 
-                // Load base abilities
-                for (int i = 1; i < 99; i++)
-                {
-                   baseAbilities.Add((Ability)i);
-                }
-                List<Ability> a1 = AbilitiesUtil.GetAbilities(false, categoryCriteria: AbilityMetaCategory.Part1Rulebook);
-                List<Ability> a2 = AbilitiesUtil.GetAbilities(false, categoryCriteria: AbilityMetaCategory.Part3Rulebook);
-               
+                List<Ability> allAbilities = Enumerable.Range(0, (int)Ability.NUM_ABILITIES).Select(a => (Ability)a).ToList();
+
+                List<Ability> abilities = allAbilities.Where(a => AbilitiesUtil.GetInfo(a) != null && (AbilitiesUtil.GetInfo(a).metaCategories.Contains(AbilityMetaCategory.Part1Rulebook) || AbilitiesUtil.GetInfo(a).metaCategories.Contains(AbilityMetaCategory.Part3Rulebook))).ToList();
+
+                List<NewAbility> moddedAbilities = NewAbility.abilities;
+
+                abilities.AddRange(moddedAbilities.Where(na => na.info != null && (na.info.metaCategories.Contains(AbilityMetaCategory.Part1Rulebook) || na.info.metaCategories.Contains(AbilityMetaCategory.Part3Rulebook))).Select(na => na.ability));
+
                 Transform objP = ((List<Transform>)__instance.GetType().GetField("cardPositionMarkers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(__instance))[0];
                 
                 // Create confirm card
@@ -1257,19 +1257,6 @@ namespace IGCCMod
                     selectedCard = (SelectableCard)c2;
                 });
 
-                // Remove duplicates
-                foreach (Ability a in baseAbilities)
-                {
-                    if (!abilities.Contains(a)) abilities.Add(a);
-                }
-                foreach (Ability a in a1)
-                {
-                    if (!abilities.Contains(a)) abilities.Add(a);
-                }
-                foreach (Ability a in a2)
-                {
-                    if (!abilities.Contains(a)) abilities.Add(a);
-                }
                 List<CardInfo> choices = null;
                 Transform obj = null;
                 LookDown();

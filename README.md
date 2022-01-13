@@ -1,6 +1,5 @@
 ## In-game Card Creator ##
-The code is a bit of a mess right now. I'll work on improving it soon.<br>
-I'm somewhat new to C# and Harmony. Feel free to point out any bad conventions or other mistakes that aren't immediately obvious.<br>
+Rewrite coming soon!
 Discord: **IngoH#3923**<br>
 The repository has two DLLs. The main one, IGCCMod.dll, and the utility one for testing, UtilMod.dll<br>
 The utility DLL contains features such as unlocking the painting when looking at it, infinite clover rerolls, and resetting the run when the clock is set to 666.
@@ -8,8 +7,12 @@ The utility DLL contains features such as unlocking the painting when looking at
 **To access the card creator, use the backroom door handle.**<br>
 
 ### Changelog ###
+
+#### 1.2.0
+- Added Kaycee's Mod compatibility.
+
 #### 1.1.2
-- Fixed incompatibility with DialogRemover
+- Fixed incompatibility with DialogRemover.
 
 #### 1.1.1
 - Renamed the incorrectly named 'cost' property to 'bloodCost'.

@@ -71,7 +71,7 @@ namespace IGCCMod.JSON
             List<Ability> modAbilities = new List<Ability>();
             foreach (Ability ability in values)
             {
-                if ((int)ability <= 99) baseAbilities.Add(ability);
+                if ((int)ability < (int)Ability.NUM_ABILITIES) baseAbilities.Add(ability);
                 else modAbilities.Add(ability);
             }
             if (baseAbilities.Count > 0) all += "  " + "\"abilities\": [" + ParseListAbilityJson(baseAbilities) + "],\r\n";
@@ -113,7 +113,7 @@ namespace IGCCMod.JSON
             foreach (Ability value in values)
             {
                 if (initial != "\r\n") initial += ",\r\n";
-                APIPlugin.AbilityIdentifier id = APIPlugin.NewAbility.abilities[(int)value - 100].id;
+                APIPlugin.AbilityIdentifier id = APIPlugin.NewAbility.abilities[(int)value - (int)Ability.NUM_ABILITIES].id;
                 string guid = id.ToString().Split(new char[] { '(' })[0];
                 string name = id.ToString().Split(new char[] { '(' })[1].Split(new char[] { ')' })[0];
                 initial += "    {\r\n";
