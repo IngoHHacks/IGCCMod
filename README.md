@@ -1,7 +1,7 @@
 ## In-game Card Creator ##
 Rewrite coming soon!
 Discord: **IngoH#3923**<br>
-The repository has two DLLs. The main one, IGCCMod.dll, and the utility one for testing, UtilMod.dll<br>
+The GitHub repository has two DLLs. The main one, IGCCMod.dll, and the utility one for testing, UtilMod.dll<br>
 The utility DLL contains features such as unlocking the painting when looking at it, infinite clover rerolls, and resetting the run when the clock is set to 666.
 
 **To access the card creator, use the backroom door handle.**<br>
