@@ -8,6 +8,9 @@ The utility DLL contains features such as unlocking the painting when looking at
 
 ### Changelog ###
 
+#### 1.2.1
+- Reverted Kaycee's Mod compatibility. Use 1.2.0 for Kaycee's Mod.
+
 #### 1.2.0
 - Added Kaycee's Mod compatibility.
 
