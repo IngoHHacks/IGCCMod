@@ -113,7 +113,7 @@ namespace IGCCMod.JSON
             foreach (Ability value in values)
             {
                 if (initial != "\r\n") initial += ",\r\n";
-                APIPlugin.AbilityIdentifier id = APIPlugin.NewAbility.abilities[(int)value - (int)Ability.NUM_ABILITIES].id;
+                APIPlugin.AbilityIdentifier id = APIPlugin.NewAbility.abilities[(int)value - ((int)Ability.NUM_ABILITIES + 1)].id;
                 string guid = id.ToString().Split(new char[] { '(' })[0];
                 string name = id.ToString().Split(new char[] { '(' })[1].Split(new char[] { ')' })[0];
                 initial += "    {\r\n";
