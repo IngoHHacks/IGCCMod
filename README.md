@@ -8,6 +8,9 @@ The utility DLL contains features such as unlocking the painting when looking at
 
 ### Changelog ###
 
+#### 1.2.3
+- Fix appearanceBehaviour spelling
+
 #### 1.2.2
 - Fixed custom abilities.
 

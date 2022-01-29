@@ -27,7 +27,7 @@ namespace IGCCMod.JSON
             if (preview.Info.GemsCost.Count > 0) json += GetJsonFromStringList("gemsCost", preview.Info.GemsCost) + ",\r\n";
             json += GetJsonFromStringList("tribes", preview.Info.tribes) + ",\r\n";
             if (preview.Info.Abilities.Count > 0) json += GetJsonFromAbilityList(preview.Info.Abilities);
-            if (preview.Info.appearanceBehaviour.Count > 0) json += GetJsonFromStringList("appearanceBehavior", preview.Info.appearanceBehaviour) + ",\r\n";
+            if (preview.Info.appearanceBehaviour.Count > 0) json += GetJsonFromStringList("appearanceBehaviour", preview.Info.appearanceBehaviour) + ",\r\n";
             if (preview.Info.SpecialStatIcon != SpecialStatIcon.None) json += GetJsonFromString("specialStatIcon", preview.Info.SpecialStatIcon.ToString()) + ",\r\n";
             if (preview.Info.SpecialAbilities.Count > 0) json += GetJsonFromStringList("specialAbilities", preview.Info.SpecialAbilities) + ",\r\n";
             if (preview.Info.traits.Count > 0) json += GetJsonFromStringList("traits", preview.Info.traits) + ",\r\n";
