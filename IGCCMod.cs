@@ -4,6 +4,7 @@ using BepInEx.Logging;
 using DiskCardGame;
 using HarmonyLib;
 using IGCCMod.JSON;
+using InscryptionAPI.Card;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -12,6 +13,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using UnityEngine;
+using static InscryptionAPI.Card.AbilityManager;
 
 namespace IGCCMod
 {
@@ -22,7 +24,7 @@ namespace IGCCMod
     {
         private const string PluginGuid = "IngoH.inscryption.IGCCMod";
         private const string PluginName = "IGCCMod";
-        private const string PluginVersion = "1.2.3";
+        private const string PluginVersion = "2.0.0";
 
         internal static ManualLogSource Log;
 
@@ -507,27 +509,12 @@ namespace IGCCMod
                     string name = "IGCC_" + Regex.Replace(preview.Info.DisplayedNameEnglish.Replace(" ", "_"), "\\W", "_");
                     string json = JsonParser.ParseCard(name, preview);
                     Directory.CreateDirectory(Paths.PluginPath + "/JSONLoader/Cards");
-                    File.WriteAllText(Paths.PluginPath + "/JSONLoader/Cards/" + name + "_card.jldr", json);
+                    File.WriteAllText(Paths.PluginPath + "/JSONLoader/Cards/" + name + "_card.jldr2", json);
                     Directory.CreateDirectory(Paths.PluginPath + "/JSONLoader/Artwork");
                     File.WriteAllBytes(Paths.PluginPath + "/JSONLoader/Artwork/" + name + ".png", CloneTextureReadable(preview.Info.portraitTex.texture).EncodeToPNG());
                     JLPlugin.Data.CardData card = JLPlugin.Utils.JLUtils.CreateFromJSON(json);
                     card.GenerateNew();
-                    List<CardInfo> official = ScriptableObjectLoader<CardInfo>.AllData;
-                    string orig = preview.Info.name;
-                    APIPlugin.NewCard.cards[APIPlugin.NewCard.cards.Count - 1].name = name;
-                    APIPlugin.NewCard.cards[APIPlugin.NewCard.cards.Count - 1].evolveParams = preview.Info.evolveParams;
-                    APIPlugin.NewCard.cards[APIPlugin.NewCard.cards.Count - 1].iceCubeParams = preview.Info.iceCubeParams;
-                    if (preview.Info.metaCategories.Contains(CardMetaCategory.ChoiceNode) || preview.Info.metaCategories.Contains(CardMetaCategory.Rare))
-                    {
-                        ScriptableObjectLoader<CardInfo>.AllData.Add(APIPlugin.NewCard.cards[APIPlugin.NewCard.cards.Count - 1]);
-                        SaveManager.SaveFile.currentRun.playerDeck.AddCard(APIPlugin.NewCard.cards[APIPlugin.NewCard.cards.Count - 1]);
-                        yield return Singleton<TextDisplayer>.Instance.ShowUntilInput("The card has been created and added to your deck.");
-                    }
-                    else
-                    {
-                        ScriptableObjectLoader<CardInfo>.AllData.Add(APIPlugin.NewCard.cards[APIPlugin.NewCard.cards.Count - 1]);
-                        yield return Singleton<TextDisplayer>.Instance.ShowUntilInput("The card has been created.");
-                    }
+                    yield return Singleton<TextDisplayer>.Instance.ShowUntilInput("The card has been created.");
                     
                 }
                 if (selectedCard.Info.DisplayedNameEnglish.Contains("quit"))
@@ -1236,9 +1223,9 @@ namespace IGCCMod
 
                 List<Ability> abilities = allAbilities.Where(a => AbilitiesUtil.GetInfo(a) != null && (AbilitiesUtil.GetInfo(a).metaCategories.Contains(AbilityMetaCategory.Part1Rulebook) || AbilitiesUtil.GetInfo(a).metaCategories.Contains(AbilityMetaCategory.Part3Rulebook))).ToList();
 
-                List<NewAbility> moddedAbilities = NewAbility.abilities;
+                List<AbilityManager.FullAbility> moddedAbilities = AbilityManager.AllAbilities;
 
-                abilities.AddRange(moddedAbilities.Where(na => na.info != null && (na.info.metaCategories.Contains(AbilityMetaCategory.Part1Rulebook) || na.info.metaCategories.Contains(AbilityMetaCategory.Part3Rulebook))).Select(na => na.ability));
+                abilities.AddRange(moddedAbilities.Where(na => na.Info != null && !allAbilities.Contains(na.Id) && (na.Info.metaCategories.Contains(AbilityMetaCategory.Part1Rulebook) || na.Info.metaCategories.Contains(AbilityMetaCategory.Part3Rulebook))).Select(na => na.Id));
 
                 Transform objP = ((List<Transform>)__instance.GetType().GetField("cardPositionMarkers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(__instance))[0];
                 

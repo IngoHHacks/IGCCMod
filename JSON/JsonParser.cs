@@ -1,9 +1,12 @@
 ﻿using DiskCardGame;
+using InscryptionAPI.Card;
+using InscryptionAPI.Guid;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static InscryptionAPI.Card.AbilityManager;
 
 namespace IGCCMod.JSON
 {
@@ -14,6 +17,7 @@ namespace IGCCMod.JSON
         {
             string json = "{\r\n";
             json += GetJsonFromString("name", name) + ",\r\n";
+            json += GetJsonFromString("modPrefix", "IGCC") + ",\r\n";
             json += GetJsonFromString("displayedName", preview.Info.DisplayedNameEnglish.Replace("\"", "'")) + ",\r\n";
             json += GetJsonFromString("description", preview.Info.description.Replace("\"", "'")) + ",\r\n";
             if (preview.Info.metaCategories.Count > 0) json += GetJsonFromStringList("metaCategories", preview.Info.metaCategories) + ",\r\n";
@@ -31,18 +35,15 @@ namespace IGCCMod.JSON
             if (preview.Info.SpecialStatIcon != SpecialStatIcon.None) json += GetJsonFromString("specialStatIcon", preview.Info.SpecialStatIcon.ToString()) + ",\r\n";
             if (preview.Info.SpecialAbilities.Count > 0) json += GetJsonFromStringList("specialAbilities", preview.Info.SpecialAbilities) + ",\r\n";
             if (preview.Info.traits.Count > 0) json += GetJsonFromStringList("traits", preview.Info.traits) + ",\r\n";
+            // TODO:
             if (preview.Info.iceCubeParams != null)
             {
-                json += "\"iceCube\": {\r\n";
-                json += "  " + GetJsonFromString("creatureWithin", preview.Info.iceCubeParams.creatureWithin.name) + "\r\n";
-                json += "},\r\n";
+                json += GetJsonFromString("iceCubeName", preview.Info.iceCubeParams.creatureWithin.name) + "\r\n";
             }
             if (preview.Info.evolveParams != null)
             {
-                json += "  \"evolution\": {\r\n";
-                json += "  " + GetJsonFromString("name", preview.Info.evolveParams.evolution.name) + ",\r\n";
-                json += "  " + GetJsonFromInt("turnsToEvolve", preview.Info.evolveParams.turnsToEvolve) + "\r\n";
-                json += "  },\r\n";
+                json += "  " + GetJsonFromString("evolveIntoName", preview.Info.evolveParams.evolution.name) + ",\r\n";
+                json += "  " + GetJsonFromInt("evolveTurns", preview.Info.evolveParams.turnsToEvolve) + "\r\n";
             }
             json += GetJsonFromString("texture", name + ".png");
             json += "\r\n}";
@@ -67,15 +68,7 @@ namespace IGCCMod.JSON
         public static string GetJsonFromAbilityList(List<Ability> values)
         {
             string all = "";
-            List<Ability> baseAbilities = new List<Ability>();
-            List<Ability> modAbilities = new List<Ability>();
-            foreach (Ability ability in values)
-            {
-                if ((int)ability < (int)Ability.NUM_ABILITIES) baseAbilities.Add(ability);
-                else modAbilities.Add(ability);
-            }
-            if (baseAbilities.Count > 0) all += "  " + "\"abilities\": [" + ParseListAbilityJson(baseAbilities) + "],\r\n";
-            if (modAbilities.Count > 0) all += "  " + "\"customAbilities\": [" + ParseListModAbilityJson(modAbilities) + "  ],\r\n";
+            if (values.Count > 0) all += "  " + "\"abilities\": [" + ParseListAbilityJson(values) + "],\r\n";
             return all;
         }
 
@@ -101,27 +94,21 @@ namespace IGCCMod.JSON
             foreach (Ability value in values)
             {
                 if (initial != "") initial += ",";
-                initial += " \"" + value + "\"";
+                if (value < Ability.NUM_ABILITIES)
+                {
+                    initial += " \"" + value + "\"";
+                }
+                else
+                {
+                    initial += " \"" + GetModdedGuid(value) + "\"";
+                }
             }
             return initial + " ";
         }
 
-        private static string ParseListModAbilityJson(List<Ability> values)
+        private static string GetModdedGuid(Ability value)
         {
-            // guid and name are private
-            string initial = "\r\n";
-            foreach (Ability value in values)
-            {
-                if (initial != "\r\n") initial += ",\r\n";
-                APIPlugin.AbilityIdentifier id = APIPlugin.NewAbility.abilities[(int)value - ((int)Ability.NUM_ABILITIES + 1)].id;
-                string guid = id.ToString().Split(new char[] { '(' })[0];
-                string name = id.ToString().Split(new char[] { '(' })[1].Split(new char[] { ')' })[0];
-                initial += "    {\r\n";
-                initial += "    " + GetJsonFromString("name", name) + ",\r\n";
-                initial += "    " + GetJsonFromString("GUID", guid) + "\r\n";
-                initial += "    }\r\n";
-            }
-            return initial;
+            return "Unknown Ability";
         }
 
         private static string ParseArrayJson(string[] values)

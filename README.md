@@ -8,8 +8,11 @@ The utility DLL contains features such as unlocking the painting when looking at
 
 ### Changelog ###
 
+#### 2.0.0
+- Kaycee's Mod update.
+
 #### 1.2.3
-- Fix appearanceBehaviour spelling
+- Fix appearanceBehaviour spelling.
 
 #### 1.2.2
 - Fixed custom abilities.
