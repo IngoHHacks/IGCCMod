@@ -8,6 +8,10 @@ The utility DLL contains features such as unlocking the painting when looking at
 
 ### Changelog ###
 
+
+#### 2.1.0
+Fix custom abilities and evolutions.
+
 #### 2.0.0
 - Kaycee's Mod update.
 

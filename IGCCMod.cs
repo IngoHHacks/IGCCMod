@@ -24,7 +24,7 @@ namespace IGCCMod
     {
         private const string PluginGuid = "IngoH.inscryption.IGCCMod";
         private const string PluginName = "IGCCMod";
-        private const string PluginVersion = "2.0.0";
+        private const string PluginVersion = "2.1.0";
 
         internal static ManualLogSource Log;
 
@@ -512,9 +512,7 @@ namespace IGCCMod
                     File.WriteAllText(Paths.PluginPath + "/JSONLoader/Cards/" + name + "_card.jldr2", json);
                     Directory.CreateDirectory(Paths.PluginPath + "/JSONLoader/Artwork");
                     File.WriteAllBytes(Paths.PluginPath + "/JSONLoader/Artwork/" + name + ".png", CloneTextureReadable(preview.Info.portraitTex.texture).EncodeToPNG());
-                    JLPlugin.Data.CardData card = JLPlugin.Utils.JLUtils.CreateFromJSON(json);
-                    card.GenerateNew();
-                    yield return Singleton<TextDisplayer>.Instance.ShowUntilInput("The card has been created.");
+                    yield return Singleton<TextDisplayer>.Instance.ShowUntilInput("The card has been created. You need to restart the game for it to be added.");
                     
                 }
                 if (selectedCard.Info.DisplayedNameEnglish.Contains("quit"))
@@ -898,6 +896,7 @@ namespace IGCCMod
                                         else if (type == 1) addTo.nameReplacement = "default (opposum)";
                                     }
                                     else c = validCards[page * 15 + i - 1];
+                                    c.specialAbilities = new List<SpecialTriggeredAbility>();
                                 }
                                 else
                                 {

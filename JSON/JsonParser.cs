@@ -38,12 +38,12 @@ namespace IGCCMod.JSON
             // TODO:
             if (preview.Info.iceCubeParams != null)
             {
-                json += GetJsonFromString("iceCubeName", preview.Info.iceCubeParams.creatureWithin.name) + "\r\n";
+                json += GetJsonFromString("iceCubeName", preview.Info.iceCubeParams.creatureWithin.name) + ",\r\n";
             }
             if (preview.Info.evolveParams != null)
             {
-                json += "  " + GetJsonFromString("evolveIntoName", preview.Info.evolveParams.evolution.name) + ",\r\n";
-                json += "  " + GetJsonFromInt("evolveTurns", preview.Info.evolveParams.turnsToEvolve) + "\r\n";
+                json += GetJsonFromString("evolveIntoName", preview.Info.evolveParams.evolution.name) + ",\r\n";
+                json += GetJsonFromInt("evolveTurns", preview.Info.evolveParams.turnsToEvolve) + ",\r\n";
             }
             json += GetJsonFromString("texture", name + ".png");
             json += "\r\n}";
@@ -108,7 +108,30 @@ namespace IGCCMod.JSON
 
         private static string GetModdedGuid(Ability value)
         {
-            return "Unknown Ability";
+            bool found = false;
+            string guid = null;
+            foreach (Dictionary<string, string> dict in InscryptionAPI.Saves.ModdedSaveManager.SaveData.SaveData.Values)
+            {
+                List<KeyValuePair<string, string>> pairs = dict.ToList();
+                foreach (KeyValuePair<string, string> pair in pairs)
+                {
+                    if (pair.Value == value.ToString())
+                    {
+                        found = true;
+                        guid = pair.Key;
+                        break;
+                    }
+                }
+                if (found)
+                {
+                    break;
+                }
+            }
+            if (guid == null)
+            {
+                Plugin.Log.LogError("Ability " + value.ToString() + " not found!");
+            }
+            return guid.Substring(8);
         }
 
         private static string ParseArrayJson(string[] values)
