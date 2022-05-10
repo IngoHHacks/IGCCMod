@@ -7,6 +7,9 @@ The utility DLL contains features such as unlocking the painting when looking at
 
 ### Changelog ###
 
+#### 2.2.2
+- Fixed README
+
 #### 2.2.1
 - Fixed custom abilities again.
 
