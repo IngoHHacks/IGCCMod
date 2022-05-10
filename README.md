@@ -16,7 +16,7 @@ The utility DLL contains features such as unlocking the painting when looking at
 - Updated Lammergeier attack to follow Kaycee's Mod behavior.
 - Shortened intro sequence.
 - Selecting no tribes no longer adds the None tribe.
-- Moved card export folder to '''IGCCExports''' and added explanation.
+- Moved card export folder to ```IGCCExports``` and added explanation.
 
 #### 2.1.0
 - Fixed custom abilities and evolutions.
