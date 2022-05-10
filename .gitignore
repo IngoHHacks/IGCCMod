@@ -6,6 +6,5 @@ obj/
 !UtilMod.dll
 Properties/
 lib/*
-!lib/Sirenix.Serialization.dll
-*.sln
 *.csproj.user
+bin/Release/netstandard2.0/IGCCMod.deps.json

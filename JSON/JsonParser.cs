@@ -1,6 +1,7 @@
 ﻿using DiskCardGame;
 using InscryptionAPI.Card;
 using InscryptionAPI.Guid;
+using InscryptionAPI.Saves;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -110,12 +111,13 @@ namespace IGCCMod.JSON
         {
             bool found = false;
             string guid = null;
-            foreach (Dictionary<string, string> dict in InscryptionAPI.Saves.ModdedSaveManager.SaveData.SaveData.Values)
+            var values = ModdedSaveManager.SaveData.SaveData.Values;
+            foreach (Dictionary<string, object> dict in values)
             {
-                List<KeyValuePair<string, string>> pairs = dict.ToList();
-                foreach (KeyValuePair<string, string> pair in pairs)
+                List<KeyValuePair<string, object>> pairs = dict.ToList();
+                foreach (KeyValuePair<string, object> pair in pairs)
                 {
-                    if (pair.Value == value.ToString())
+                    if (pair.Value.ToString() == value.ToString())
                     {
                         found = true;
                         guid = pair.Key;
@@ -129,7 +131,7 @@ namespace IGCCMod.JSON
             }
             if (guid == null)
             {
-                Plugin.Log.LogError("Ability " + value.ToString() + " not found!");
+                IGCC.Log.LogError("Ability " + value.ToString() + " not found!");
             }
             return guid.Substring(8);
         }

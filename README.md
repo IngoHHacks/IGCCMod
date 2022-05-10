@@ -1,5 +1,4 @@
 ## In-game Card Creator ##
-Rewrite coming soon!
 Discord: **IngoH#3923**<br>
 The GitHub repository has two DLLs. The main one, IGCCMod.dll, and the utility one for testing, UtilMod.dll<br>
 The utility DLL contains features such as unlocking the painting when looking at it, infinite clover rerolls, and resetting the run when the clock is set to 666.
@@ -8,15 +7,25 @@ The utility DLL contains features such as unlocking the painting when looking at
 
 ### Changelog ###
 
+#### 2.2.1
+- Fixed custom abilities again.
+
+#### 2.2.0
+- Added the ability to edit cards after the initial sequence.
+- Update to API 2.2.0.
+- Updated Lammergeier attack to follow Kaycee's Mod behavior.
+- Shortened intro sequence.
+- Selecting no tribes no longer adds the None tribe.
+- Moved card export folder to '''IGCCExports''' and added explanation.
 
 #### 2.1.0
-Fix custom abilities and evolutions.
+- Fixed custom abilities and evolutions.
 
 #### 2.0.0
 - Kaycee's Mod update.
 
 #### 1.2.3
-- Fix appearanceBehaviour spelling.
+- Fixed appearanceBehaviour spelling.
 
 #### 1.2.2
 - Fixed custom abilities.
