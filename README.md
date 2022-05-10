@@ -58,6 +58,7 @@ The utility DLL contains features such as unlocking the painting when looking at
 - Some options are missing.
 - Regular death card creation doesn't work.
 - Portraits can contain duplicates.
+- Switching cards back from rare to regular doesn't update the preview card.
 - Some properties do not show up correctly (Won't fix)
 
 ### Other Notes ###
