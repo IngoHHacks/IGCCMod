@@ -7,4 +7,4 @@ obj/
 Properties/
 lib/*
 *.csproj.user
-bin/Release/netstandard2.0/IGCCMod.deps.json
+bin/
