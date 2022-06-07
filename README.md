@@ -12,7 +12,7 @@ Discord: [**IngoH#3923**](https://discord.com/users/381801621950169089)<br>
 - Portraits only load once now.
 
 #### 2.2.2
-- Fixed README
+- Fixed README.
 
 #### 2.2.1
 - Fixed custom abilities again.
