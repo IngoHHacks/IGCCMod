@@ -6,6 +6,11 @@ Discord: [**IngoH#3923**](https://discord.com/users/381801621950169089)<br>
 
 ### Changelog ###
 
+#### 2.3.0
+- Added support for alternate portraits and emissions.
+- Emissions get automatically added when a file of the same name suffixed by `_emission` exists.
+- Portraits only load once now.
+
 #### 2.2.2
 - Fixed README
 
