@@ -3,6 +3,7 @@ using BepInEx.Logging;
 using DiskCardGame;
 using HarmonyLib;
 using IGCCMod.JSON;
+using IGCCMod.Util;
 using System.Collections;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -423,37 +424,9 @@ namespace IGCCMod
                         yield return new WaitForSeconds(0.25f);
                         break;
                     case 8:
-                        // Load textures from cards
-                        // TODO: Remove duplicates
-                        Singleton<TextDisplayer>.Instance.ShowMessage("Loading portraits.");
-                        Resources.LoadAll("art/cards/");
-                        Texture2D[] textures = (Texture2D[])Resources.FindObjectsOfTypeAll(typeof(Texture2D));
-                        List<Texture2D> validTextures = new List<Texture2D>();
-                        int baseCount = 0;
-                        foreach (Texture2D texture in textures)
-                        {
-                            if (texture.width == 114 && texture.height == 94 && texture.name.StartsWith("portrait") && !texture.name.EndsWith("_emission"))
-                            {
-                                validTextures.Add(texture);
-                                baseCount++;
-                            }
-                        }
-                        int modCount = 0;
-                        foreach (string file in Directory.GetFiles(Paths.PluginPath, "*.png", SearchOption.AllDirectories))
-                        {
-
-                            byte[] pngBytes = System.IO.File.ReadAllBytes(file);
-                            Texture2D texture = new Texture2D(2, 2);
-                            ImageConversion.LoadImage(texture, pngBytes);
-                            texture.name = file;
-                            if (texture.width == 114 && texture.height == 94 && !texture.name.EndsWith("_emission"))
-                            {
-                                validTextures.Add(texture);
-                                modCount++;
-                            }
-                        }
+                        List<Texture2D> textures = PortraitLoader.Instance.GetPortraits();
                         // Portrait
-                        yield return CreatePortrait(__instance, preview, validTextures, baseCount, modCount);
+                        yield return CreatePortrait(__instance, preview, textures, 0);
                         preview.Anim.PlayTransformAnimation();
                         yield return new WaitForSeconds(0.15f);
                         preview.SetInfo(preview.Info);
@@ -487,6 +460,18 @@ namespace IGCCMod
                         break;
                     default:
                         yield return new WaitForSeconds(0.25f);
+                        break;
+                    case 11:
+                        List<Texture2D> textures2 = PortraitLoader.Instance.GetPortraits();
+                        // Portrait
+                        yield return CreatePortrait(__instance, preview, textures2, 1);
+                        preview.Anim.PlayTransformAnimation();
+                        yield return new WaitForSeconds(0.15f);
+                        preview.SetInfo(preview.Info);
+                        yield return new WaitForSeconds(0.25f);
+                        break;
+                    case 12:
+                        // DECALS
                         break;
                 }
                 if (!prevSelects.Contains(i)) prevSelects.Add(i);

@@ -5,6 +5,7 @@ using DiskCardGame;
 using HarmonyLib;
 using IGCCMod;
 using IGCCMod.JSON;
+using IGCCMod.Util;
 using InscryptionAPI.Card;
 using System;
 using System.Collections;
@@ -347,13 +348,12 @@ public class CardSelectSequencers
         yield return PostCardSelect(cards, selectedCard, 0);
     }
 
-    public static IEnumerator CreatePortrait(DeathCardCreationSequencer __instance, SelectableCard preview, List<Texture2D> portraits, int baseCount, int modCount)
+    public static IEnumerator CreatePortrait(DeathCardCreationSequencer __instance, SelectableCard preview, List<Texture2D> portraits, int type)
     {
         bool valid = false;
         int page = 0;
         SelectableCard selectedCard = null;
         List<SelectableCard> cards = new List<SelectableCard>();
-        yield return Singleton<TextDisplayer>.Instance.ShowUntilInput("I found [c:bR]" + baseCount + " loaded portraits[c:] and [c:bR]" + modCount + " portrait files[c:].");
         // Look at floor
         IGCC.LookDown();
         // Until a non-page card is selected
@@ -443,7 +443,14 @@ public class CardSelectSequencers
         }
         Singleton<TextDisplayer>.Instance.Clear();
         // Copy portrait to preview card
-        preview.Info.portraitTex = Sprite.Create(selectedCard.Info.portraitTex.texture, new Rect(0.0f, 0.0f, 114.0f, 94.0f), new Vector2(0.5f, 0.5f));
+        if (type == 0)
+        {
+            preview.Info.portraitTex = Sprite.Create(selectedCard.Info.portraitTex.texture, new Rect(0.0f, 0.0f, 114.0f, 94.0f), new Vector2(0.5f, 0.5f));
+        }
+        else
+        {
+            preview.Info.alternatePortrait = Sprite.Create(selectedCard.Info.portraitTex.texture, new Rect(0.0f, 0.0f, 114.0f, 94.0f), new Vector2(0.5f, 0.5f));
+        }
         // Leshy comment about the choice
         yield return PostCardSelect(cards, selectedCard, 3);
     }
@@ -1756,6 +1763,20 @@ public class CardSelectSequencers
             File.WriteAllText(Paths.PluginPath + "/IGCCExports/Cards/" + name + "_card.jldr2", json);
             Directory.CreateDirectory(Paths.PluginPath + "/IGCCExports/Artwork");
             File.WriteAllBytes(Paths.PluginPath + "/IGCCExports/Artwork/" + name + ".png", CloneTextureReadable(preview.Info.portraitTex.texture).EncodeToPNG());
+            Texture2D emission = PortraitLoader.Instance.GetEmissionForPortrait(preview.Info.portraitTex.texture);
+            if (emission != null)
+            {
+                File.WriteAllBytes(Paths.PluginPath + "/IGCCExports/Artwork/" + name + "_emission.png", CloneTextureReadable(emission).EncodeToPNG());
+            }
+            if (preview.Info.alternatePortrait != null)
+            {
+                File.WriteAllBytes(Paths.PluginPath + "/IGCCExports/Artwork/" + name + "_alt.png", CloneTextureReadable(preview.Info.alternatePortrait.texture).EncodeToPNG());
+                Texture2D altEmission = PortraitLoader.Instance.GetEmissionForPortrait(preview.Info.alternatePortrait.texture);
+                if (altEmission != null)
+                {
+                    File.WriteAllBytes(Paths.PluginPath + "/IGCCExports/Artwork/" + name + "_alt_emission.png", CloneTextureReadable(altEmission).EncodeToPNG());
+                }
+            }
             yield return Singleton<TextDisplayer>.Instance.ShowUntilInput("The card has been created and exported to IGCCExports inside the BepInEx plugins folder. You need to restart the game for it to be added.");
 
         }
@@ -1782,9 +1803,9 @@ public class CardSelectSequencers
         List<CardInfo> choices = new List<CardInfo>();
         List<SelectableCard> cards = new List<SelectableCard>();
         Transform obj = ((List<Transform>)__instance.GetType().GetField("cardPositionMarkers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(__instance))[0];
-        for (int i = 0; i <= 10; i++)
+        for (int i = 0; i <= 11; i++)
         {
-            Vector3 vector = GetCardIndexLoc(obj, i < 10 ? i : 12);
+            Vector3 vector = GetCardIndexLoc(obj, i < 11 ? i : 14);
             CardInfo c = ScriptableObject.CreateInstance<CardInfo>();
             CardModificationInfo addTo = new CardModificationInfo();
             switch (i)
@@ -1820,6 +1841,12 @@ public class CardSelectSequencers
                     addTo.nameReplacement = "complexity";
                     break;
                 case 10:
+                    addTo.nameReplacement = "alternate portrait";
+                    break;
+                //case 11:
+                //     addTo.nameReplacement = "decals";
+                //     break;
+                case 11:
                     addTo.nameReplacement = "finish";
                     c.appearanceBehaviour.Add(CardAppearanceBehaviour.Appearance.RareCardBackground);
                     break;
@@ -1841,7 +1868,7 @@ public class CardSelectSequencers
         yield return new WaitUntil(() => selectedCard != null);
         Singleton<TextDisplayer>.Instance.Clear();
         ir.Value = cards.IndexOf(selectedCard) + 1;
-        if (ir.Value == 11) ir.Value = -1;
+        if (ir.Value == 12) ir.Value = -1;
         DestroyAllCards(cards, true);
         yield return new WaitForSeconds(0.55f);
     }

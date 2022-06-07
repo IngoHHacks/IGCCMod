@@ -1,4 +1,5 @@
 ﻿using DiskCardGame;
+using IGCCMod.Util;
 using InscryptionAPI.Card;
 using InscryptionAPI.Guid;
 using InscryptionAPI.Saves;
@@ -7,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 using static InscryptionAPI.Card.AbilityManager;
 
 namespace IGCCMod.JSON
@@ -45,6 +47,20 @@ namespace IGCCMod.JSON
             {
                 json += GetJsonFromString("evolveIntoName", preview.Info.evolveParams.evolution.name) + ",\r\n";
                 json += GetJsonFromInt("evolveTurns", preview.Info.evolveParams.turnsToEvolve) + ",\r\n";
+            }
+            if (preview.Info.alternatePortrait != null)
+            {
+                json += GetJsonFromString("altTexture", name + "_alt.png") + ",\r\n";
+            }
+            Texture2D emission = PortraitLoader.Instance.GetEmissionForPortrait(preview.Info.portraitTex.texture);
+            if (emission != null)
+            {
+                json += GetJsonFromString("emissionTexture", name + "_emission.png") + ",\r\n";
+            }
+            Texture2D altEmission = preview.Info.alternatePortrait != null ? PortraitLoader.Instance.GetEmissionForPortrait(preview.Info.alternatePortrait.texture) : null;
+            if (altEmission != null)
+            {
+                json += GetJsonFromString("altEmissionTexture", name + "_alt_emission.png") + ",\r\n";
             }
             json += GetJsonFromString("texture", name + ".png");
             json += "\r\n}";
