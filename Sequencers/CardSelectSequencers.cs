@@ -847,11 +847,11 @@ public class CardSelectSequencers
 
         List<Ability> allAbilities = Enumerable.Range(0, (int)Ability.NUM_ABILITIES).Select(a => (Ability)a).ToList();
 
-        List<Ability> abilities = allAbilities.Where(a => AbilitiesUtil.GetInfo(a) != null && (AbilitiesUtil.GetInfo(a).metaCategories.Contains(AbilityMetaCategory.Part1Rulebook) || AbilitiesUtil.GetInfo(a).metaCategories.Contains(AbilityMetaCategory.Part3Rulebook))).ToList();
+        List<Ability> abilities = allAbilities.Where(a => AbilitiesUtil.GetInfo(a) != null && (AbilitiesUtil.GetInfo(a).metaCategories.Contains(AbilityMetaCategory.Part1Rulebook) || AbilitiesUtil.GetInfo(a).metaCategories.Contains(AbilityMetaCategory.Part3Rulebook) || AbilitiesUtil.GetInfo(a).metaCategories.Contains(AbilityMetaCategory.Part1Modular) || AbilitiesUtil.GetInfo(a).metaCategories.Contains(AbilityMetaCategory.Part3Modular))).ToList();
 
         List<AbilityManager.FullAbility> moddedAbilities = AbilityManager.AllAbilities;
 
-        abilities.AddRange(moddedAbilities.Where(na => na.Info != null && !allAbilities.Contains(na.Id) && (na.Info.metaCategories.Contains(AbilityMetaCategory.Part1Rulebook) || na.Info.metaCategories.Contains(AbilityMetaCategory.Part3Rulebook))).Select(na => na.Id));
+        abilities.AddRange(moddedAbilities.Where(na => na.Info != null && !allAbilities.Contains(na.Id) && (na.Info.metaCategories.Contains(AbilityMetaCategory.Part1Rulebook) || na.Info.metaCategories.Contains(AbilityMetaCategory.Part3Rulebook) || na.Info.metaCategories.Contains(AbilityMetaCategory.Part1Modular) || na.Info.metaCategories.Contains(AbilityMetaCategory.Part3Modular))).Select(na => na.Id));
 
         Transform objP = ((List<Transform>)__instance.GetType().GetField("cardPositionMarkers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(__instance))[0];
 
