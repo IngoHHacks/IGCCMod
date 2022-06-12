@@ -19,7 +19,7 @@ namespace IGCCMod
     {
         private const string PluginGuid = "IngoH.inscryption.IGCCMod";
         private const string PluginName = "IGCCMod";
-        private const string PluginVersion = "2.3.1";
+        private const string PluginVersion = "2.4.0";
 
         internal static ManualLogSource Log;
 

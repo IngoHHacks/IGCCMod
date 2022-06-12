@@ -6,6 +6,9 @@ Discord: [**IngoH#3923**](https://discord.com/users/381801621950169089)<br>
 
 ### Changelog ###
 
+#### 2.4.0
+- Cards get added automatically now.
+
 #### 2.3.1
 - Fix for API 2.3.0.
 

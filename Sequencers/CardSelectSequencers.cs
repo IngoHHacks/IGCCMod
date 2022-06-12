@@ -7,6 +7,7 @@ using IGCCMod;
 using IGCCMod.JSON;
 using IGCCMod.Util;
 using InscryptionAPI.Card;
+using JSONLoader.API;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -1777,7 +1778,8 @@ public class CardSelectSequencers
                     File.WriteAllBytes(Paths.PluginPath + "/IGCCExports/Artwork/" + name + "_alt_emission.png", CloneTextureReadable(altEmission).EncodeToPNG());
                 }
             }
-            yield return Singleton<TextDisplayer>.Instance.ShowUntilInput("The card has been created and exported to IGCCExports inside the BepInEx plugins folder. You need to restart the game for it to be added.");
+            JSONLoaderAPI.AddCards(json);
+            yield return Singleton<TextDisplayer>.Instance.ShowUntilInput("The card has been created, loaded, and exported to IGCCExports inside the BepInEx plugins folder.");
 
         }
         if (selectedCard.Info.DisplayedNameEnglish.Contains("quit"))
