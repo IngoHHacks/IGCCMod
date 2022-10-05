@@ -32,13 +32,12 @@ namespace IGCCMod.JSON
             if (preview.Info.BonesCost > 0) json += GetJsonFromInt("bonesCost", preview.Info.BonesCost) + ",\r\n";
             if (preview.Info.EnergyCost > 0) json += GetJsonFromInt("energyCost", preview.Info.EnergyCost) + ",\r\n";
             if (preview.Info.GemsCost.Count > 0) json += GetJsonFromStringList("gemsCost", preview.Info.GemsCost) + ",\r\n";
-            json += GetJsonFromStringList("tribes", preview.Info.tribes) + ",\r\n";
+            if (preview.Info.tribes.Count > 0) json += GetJsonFromTribeList(preview.Info.tribes);
             if (preview.Info.Abilities.Count > 0) json += GetJsonFromAbilityList(preview.Info.Abilities);
             if (preview.Info.appearanceBehaviour.Count > 0) json += GetJsonFromStringList("appearanceBehaviour", preview.Info.appearanceBehaviour) + ",\r\n";
             if (preview.Info.SpecialStatIcon != SpecialStatIcon.None) json += GetJsonFromString("specialStatIcon", preview.Info.SpecialStatIcon.ToString()) + ",\r\n";
             if (preview.Info.SpecialAbilities.Count > 0) json += GetJsonFromStringList("specialAbilities", preview.Info.SpecialAbilities) + ",\r\n";
             if (preview.Info.traits.Count > 0) json += GetJsonFromStringList("traits", preview.Info.traits) + ",\r\n";
-            // TODO:
             if (preview.Info.iceCubeParams != null)
             {
                 json += GetJsonFromString("iceCubeName", preview.Info.iceCubeParams.creatureWithin.name) + ",\r\n";
@@ -67,6 +66,61 @@ namespace IGCCMod.JSON
             return json;
         }
 
+        private static string GetJsonFromTribeList(List<Tribe> values)
+        {   
+            string all = "";
+            if (values.Count > 0) all += "  " + "\"tribes\": [" + ParseListTribeJson(values) + "],\r\n";
+            return all;
+        }
+
+        private static object ParseListTribeJson(List<Tribe> values)
+        {
+            string initial = "";
+            foreach (Tribe value in values)
+            {
+                if (initial != "") initial += ",";
+                if (value < Tribe.NUM_TRIBES)
+                {
+                    initial += " \"" + value + "\"";
+                }
+                else
+                {
+                    initial += " \"" + GetModdedGuid(value) + "\"";
+                }
+            }
+            return initial + " ";
+        }
+
+
+        public static string GetModdedGuid(Tribe value)
+        {
+            bool found = false;
+            string guid = null;
+            var values = ModdedSaveManager.SaveData.SaveData.Values;
+            foreach (Dictionary<string, object> dict in values)
+            {
+                List<KeyValuePair<string, object>> pairs = dict.ToList();
+                foreach (KeyValuePair<string, object> pair in pairs)
+                {
+                    if (pair.Value.ToString() == value.ToString())
+                    {
+                        found = true;
+                        guid = pair.Key;
+                        break;
+                    }
+                }
+                if (found)
+                {
+                    break;
+                }
+            }
+            if (guid == null)
+            {
+                IGCC.Log.LogError("Tribe " + value.ToString() + " not found!");
+            }
+            return guid.Substring(6);
+        }
+        
         public static string GetJsonFromString(string key, string value)
         {
             return "  " + "\"" + key + "\": " + "\"" + value + "\"";
@@ -122,6 +176,7 @@ namespace IGCCMod.JSON
             }
             return initial + " ";
         }
+
 
         private static string GetModdedGuid(Ability value)
         {

@@ -1,10 +1,17 @@
 ## In-game Card Creator ##
 Does as the title says.  
-Discord: [**IngoH#3923**](https://discord.com/users/381801621950169089)<br>
+**To access the card creator, use the backroom door handle.**
 
-**To access the card creator, use the backroom door handle.**<br>
+Contact:  
+[Discord Server](https://discord.gg/9Xqvb8Cszg) | `IngoH#3923`
 
-### Changelog ###
+
+
+### Changelog
+
+#### 2.5.0
+- Added support for custom tribes.
+- Fixed text for evolution turn count.
 
 #### 2.4.0
 - Cards get added automatically now.
@@ -60,13 +67,13 @@ Discord: [**IngoH#3923**](https://discord.com/users/381801621950169089)<br>
 - Created cards no longer temporarily increase spawn rates.
 - Added some info and descriptions for card properties.
 
-### Planned Features ###
+### Planned Features
 - Editing/deleting existing cards.
 - Config for adding card to deck/increased spawn rates.
 - Split IGCCMod and UtilMod
 - Loading portraits from online database.
 
-### Known Bugs ###
+### Known Bugs
 - Some game-crashing abilites can be chosen.
 - Some options are missing.
 - Regular death card creation doesn't work.
@@ -74,5 +81,5 @@ Discord: [**IngoH#3923**](https://discord.com/users/381801621950169089)<br>
 - Switching cards back from rare to regular doesn't update the preview card.
 - Some properties do not show up correctly (Won't fix)
 
-### Other Notes ###
+### Other Notes
 - All portraits are exported to a new file, regardless of whether it already exists as a file.

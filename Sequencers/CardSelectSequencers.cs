@@ -599,7 +599,7 @@ public class CardSelectSequencers
                 selectedCard = (SelectableCard)c2;
             });
         }
-        Singleton<TextDisplayer>.Instance.ShowMessage("Please, choose a card to draw the [c:bR]cost[c:] from.");
+        Singleton<TextDisplayer>.Instance.ShowMessage("[c:bR]How many turns[c:] should it take for this card to evolve?");
         foreach (SelectableCard item in cards)
         {
             item.SetInteractionEnabled(interactionEnabled: true);
@@ -1196,7 +1196,7 @@ public class CardSelectSequencers
         SelectableCard selectedCard = null;
         List<Tribe> selectedTribes = new List<Tribe>();
         List<SelectableCard> cards = new List<SelectableCard>();
-        int tribeCount = (int)Tribe.NUM_TRIBES;
+        int tribeCount = (int)Tribe.NUM_TRIBES + TribeManager.tribes.Count;
         Transform objP = ((List<Transform>)__instance.GetType().GetField("cardPositionMarkers", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(__instance))[0];
         Vector3 vectorP = GetCardIndexLoc(objP, 18);
         CardInfo cP = ScriptableObject.CreateInstance<CardInfo>();
@@ -1233,12 +1233,22 @@ public class CardSelectSequencers
                             CardModificationInfo addTo = new CardModificationInfo();
                             if (i <= 14)
                             {
-                                List<Tribe> trb = new List<Tribe>
-                                            {
-                                                (Tribe)(page * 15 + i + 1)
-                                            };
-                                addTo.nameReplacement = ((Tribe)(page * 15 + i + 1)).ToString() + " tribe";
-                                c.tribes = trb;
+                                if (page * 15 + i + 1 < (int) Tribe.NUM_TRIBES)
+                                {
+                                    List<Tribe> trb = new List<Tribe> { (Tribe)(page * 15 + i + 1) };
+                                    addTo.nameReplacement = ((Tribe)(page * 15 + i + 1)).ToString() + " tribe";
+                                    c.tribes = trb;
+                                }
+                                else
+                                {
+                                    TribeManager.TribeInfo ti = TribeManager.tribes[page * 15 + i + 1 - (int)Tribe.NUM_TRIBES];
+                                    Tribe t = ti.tribe;
+                                    List<Tribe> trb = new List<Tribe> { t };
+                                    string name = JsonParser.GetModdedGuid(t);
+                                    name = name.Substring(name.IndexOf('_') + 1);
+                                    addTo.nameReplacement = name + " tribe";
+                                    c.tribes = trb;
+                                }
                             }
                             else
                             {
@@ -1550,17 +1560,23 @@ public class CardSelectSequencers
             }
         }
         string examineDialogue = "...";
-        if (selectedTribes.Count == (int)Tribe.NUM_TRIBES - 1)
-        {
-            examineDialogue = string.Format(Localization.Translate("[c:bR]All Tribes[c:]."));
-        }
-        else if (selectedTribes.Count > 0)
+        if (selectedTribes.Count > 0)
         {
             string args = "";
             int size = selectedTribes.Count;
             for (int i = 0; i < size; i++)
             {
-                args += (Localization.Translate(selectedTribes[i].ToString()));
+                string name = "";
+                if (selectedTribes[i] < Tribe.NUM_TRIBES)
+                {
+                    name = Localization.Translate(selectedTribes[i].ToString());
+                }
+                else
+                {
+                    name = JsonParser.GetModdedGuid(selectedTribes[i]);
+                    name = name.Substring(name.IndexOf('_') + 1);
+                }
+                args += (Localization.Translate(name));
                 if (i < size - 1)
                 {
                     if (i == size - 2)
@@ -1778,6 +1794,7 @@ public class CardSelectSequencers
                     File.WriteAllBytes(Paths.PluginPath + "/IGCCExports/Artwork/" + name + "_alt_emission.png", CloneTextureReadable(altEmission).EncodeToPNG());
                 }
             }
+            IGCC.Log.LogDebug("Card:\n" + json);
             JSONLoaderAPI.AddCards(json);
             yield return Singleton<TextDisplayer>.Instance.ShowUntilInput("The card has been created, loaded, and exported to IGCCExports inside the BepInEx plugins folder.");
 
