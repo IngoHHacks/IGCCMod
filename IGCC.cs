@@ -30,7 +30,6 @@ namespace IGCCMod
 
             Harmony harmony = new Harmony(PluginGuid);
             harmony.PatchAll();
-
         }
 
         [HarmonyPatch(typeof(DoorKnobInteractable), "OnCursorSelectStart")]

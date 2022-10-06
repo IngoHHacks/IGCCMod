@@ -1245,7 +1245,7 @@ public class CardSelectSequencers
                                     Tribe t = ti.tribe;
                                     List<Tribe> trb = new List<Tribe> { t };
                                     string name = JsonParser.GetModdedGuid(t);
-                                    name = name.Substring(name.IndexOf('_') + 1);
+                                    name = name.Substring(name.IndexOf('.') + 1);
                                     addTo.nameReplacement = name + " tribe";
                                     c.tribes = trb;
                                 }
@@ -1574,7 +1574,7 @@ public class CardSelectSequencers
                 else
                 {
                     name = JsonParser.GetModdedGuid(selectedTribes[i]);
-                    name = name.Substring(name.IndexOf('_') + 1);
+                    name = name.Substring(name.IndexOf('.') + 1);
                 }
                 args += (Localization.Translate(name));
                 if (i < size - 1)
