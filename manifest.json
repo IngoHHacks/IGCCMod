@@ -1,11 +1,11 @@
 {
-    "name": "InGame_Card_Creator",
-    "version_number": "2.5.0",
-    "website_url": "https://github.com/IngoHHacks/IGCCMod",
-    "description": "A BepInEx plugin that allows for the creation of custom cards in-game. Click the backroom door handle to enter the card creator mode. Cards and artwork are exported to the plugins/JSONLoader folder.",
-    "dependencies": [
-        "BepInEx-BepInExPack_Inscryption-5.4.1902",
-        "MADH95Mods-JSONCardLoader-2.2.0",
-        "API_dev-API-2.4.1"
-    ]
+  "name": "InGame_Card_Creator",
+  "version_number": "2.5.1",
+  "website_url": "https://github.com/IngoHHacks/IGCCMod",
+  "description": "A BepInEx plugin that allows for the creation of custom cards in-game. Click the backroom door handle to enter the card creator mode. Cards and artwork are exported to the plugins/IGCCExports folder.",
+  "dependencies": [
+    "BepInEx-BepInExPack_Inscryption-5.4.1902",
+    "MADH95Mods-JSONCardLoader-2.5.4",
+    "API_dev-API-2.19.4"
+  ]
 }
