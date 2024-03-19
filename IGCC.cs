@@ -19,7 +19,7 @@ public class IGCC : BaseUnityPlugin
 {
     private const string PluginGuid = "IngoH.inscryption.IGCCMod";
     private const string PluginName = "IGCCMod";
-    private const string PluginVersion = "2.5.1";
+    private const string PluginVersion = "2.5.2";
 
     internal static ManualLogSource Log;
 

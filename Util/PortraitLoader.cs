@@ -20,7 +20,7 @@ public class PortraitLoader
         // TODO: Remove duplicates
         Singleton<TextDisplayer>.Instance.ShowMessage("Loading portraits.");
         Resources.LoadAll("art/cards/");
-        Texture2D[] textures = (Texture2D[])Resources.FindObjectsOfTypeAll(typeof(Texture2D));
+        Texture2D[] textures = (Texture2D[]) Resources.FindObjectsOfTypeAll(typeof(Texture2D));
         int c1 = 0;
         int c2 = 0;
         foreach (Texture2D texture in textures)
@@ -31,13 +31,13 @@ public class PortraitLoader
                 {
                     c1++;
                     this.portraits.Add(texture);
-                    this.portraitToName.Add(texture, texture.name + "_emission");
+                    this.portraitToName[texture] = texture.name + "_emission";
                 }
                 else
                 {
                     c2++;
                     this.emissions.Add(texture);
-                    this.nameToEmission.Add(texture.name, texture);
+                    this.nameToEmission[texture.name] = texture;
                 }
             }
         }

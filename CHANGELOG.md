@@ -1,5 +1,8 @@
 ### Changelog
 
+#### 2.5.2
+- Fixed the emission issue for cards added through code.
+
 #### 2.5.1
 - Fixed an issue where portraits would not load if a vanilla emission was overwritten by a custom emission from a different mod.
 
